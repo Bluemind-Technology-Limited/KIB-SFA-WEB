@@ -1,4 +1,4 @@
-import { User as UserIcon } from 'lucide-react';
+import { User } from 'iconsax-reactjs';
 import { initials } from '../../utils/format';
 
 interface AvatarProps {
@@ -13,7 +13,7 @@ export function Avatar({ name, size = 'md' }: AvatarProps) {
     <div
       className={`${sizeClass} rounded-full bg-[#EA4335]/10 border border-[#EA4335]/20 flex items-center justify-center font-bold text-[#EA4335] uppercase shrink-0`}
     >
-      {name ? initials(name) : <UserIcon className="w-3.5 h-3.5" />}
+      {name ? initials(name) : <User size={14} variant="Bold" />}
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Building2, Users, Package, Inbox, CheckCheck, XCircle, ClipboardList, ArrowRight } from 'lucide-react';
+import { ArrowRight, Box1, Buildings2, ClipboardText, CloseCircle, DirectboxReceive, Profile2User, TickCircle } from 'iconsax-reactjs';
 import { Link } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
 import { selectUser } from '../../store/slices/authSlice';
@@ -68,13 +68,13 @@ export function DashboardPage() {
         <MetricSkeleton count={6} />
       ) : (
         metrics && (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-            <MetricCard label="Distributors" icon={<Building2 className="w-4 h-4 text-[#EA4335]" />} value={metrics.totalDistributors} sub="on platform" />
-            <MetricCard label="Sales Users" icon={<Users className="w-4 h-4 text-sky-600" />} value={metrics.totalSales} sub="active reps" />
-            <MetricCard label="Products" icon={<Package className="w-4 h-4 text-violet-600" />} value={metrics.totalProducts} sub="catalogue" />
-            <MetricCard label="Pending Requests" icon={<Inbox className="w-4 h-4 text-amber-600" />} value={metrics.pendingRequests} sub="awaiting review" />
-            <MetricCard label="Approved" icon={<CheckCheck className="w-4 h-4 text-emerald-600" />} value={metrics.approvedRequests} sub="fulfilled" />
-            <MetricCard label="Rejected" icon={<XCircle className="w-4 h-4 text-rose-600" />} value={metrics.rejectedRequests} sub="declined" />
+          <div className="grid grid-cols-2 md:grid-cols-2 xl:grid-cols-3 gap-3 md:gap-6">
+            <MetricCard label="Distributors" icon={<Buildings2 size={16} className="text-[#EA4335]" />} value={metrics.totalDistributors} sub="on platform" />
+            <MetricCard label="Sales Users" icon={<Profile2User size={16} className="text-sky-600" />} value={metrics.totalSales} sub="active reps" />
+            <MetricCard label="Products" icon={<Box1 size={16} className="text-violet-600" />} value={metrics.totalProducts} sub="catalogue" />
+            <MetricCard label="Pending Requests" icon={<DirectboxReceive size={16} className="text-amber-600" />} value={metrics.pendingRequests} sub="awaiting review" />
+            <MetricCard label="Approved" icon={<TickCircle size={16} className="text-emerald-600" />} value={metrics.approvedRequests} sub="fulfilled" />
+            <MetricCard label="Rejected" icon={<CloseCircle size={16} className="text-rose-600" />} value={metrics.rejectedRequests} sub="declined" />
           </div>
         )
       )}
@@ -83,11 +83,11 @@ export function DashboardPage() {
       <div className="bg-white border border-[#E9E9E9] rounded-xl overflow-hidden">
         <div className="flex items-center justify-between px-4 py-3.5 border-b border-[#E9E9E9]">
           <div className="flex items-center gap-2">
-            <ClipboardList className="w-4 h-4 text-[#EA4335]" />
+            <ClipboardText size={16} className="text-[#EA4335]" />
             <span className="text-xs font-semibold text-[#737373]">Recent Requests</span>
           </div>
           <Link to="/requests" className="text-xs font-semibold text-[#EA4335] flex items-center gap-1 hover:underline">
-            View all <ArrowRight className="w-3 h-3" />
+            View all <ArrowRight size={12} />
           </Link>
         </div>
 

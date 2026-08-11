@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Building2, Mail, Phone, Pencil, Power } from 'lucide-react';
+import { Buildings2, Call, DirectInbox, Edit, ToggleOn } from 'iconsax-reactjs';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
 import {
   loadDistributors,
@@ -19,6 +19,7 @@ import { ErrorState } from '../../components/ui/ErrorState';
 import { Alert } from '../../components/ui/Alert';
 import { Modal } from '../../components/ui/Modal';
 import { Button } from '../../components/ui/Button';
+import { Tooltip } from '../../components/ui/Tooltip';
 import { FormField, inputClass } from '../../components/ui/FormField';
 
 interface FormState {
@@ -90,7 +91,7 @@ export function DistributorsPage() {
       <PageHeader
         title="Distributors"
         subtitle="Create and manage the distributors sales users are assigned to."
-        actions={<Button onClick={openAdd} withPlusIcon>Add Distributor</Button>}
+        actions={<Button onClick={openAdd} withPlusIcon tooltip="Add a new distributor">Add Distributor</Button>}
       />
 
       {error && !dismissedError && (
@@ -131,7 +132,7 @@ export function DistributorsPage() {
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2.5">
                           <div className="w-8 h-8 rounded-lg bg-[#EA4335]/10 flex items-center justify-center shrink-0">
-                            <Building2 className="w-4 h-4 text-[#EA4335]" />
+                            <Buildings2 size={16} className="text-[#EA4335]" />
                           </div>
                           <div>
                             <p className="text-xs font-bold text-[#171717] leading-none">{d.name}</p>
@@ -141,10 +142,10 @@ export function DistributorsPage() {
                       </td>
                       <td className="px-4 py-3">
                         <p className="text-xs text-slate-600 flex items-center gap-1.5">
-                          <Mail className="w-3 h-3 text-slate-400" /> {d.email}
+                          <DirectInbox size={12} className="text-slate-400" /> {d.email}
                         </p>
                         <p className="text-[10px] text-slate-400 flex items-center gap-1.5 mt-0.5">
-                          <Phone className="w-2.5 h-2.5" /> {d.phone}
+                          <Call size={10} /> {d.phone}
                         </p>
                       </td>
                       <td className="px-4 py-3 text-xs text-slate-600">{d.location}</td>
@@ -161,12 +162,16 @@ export function DistributorsPage() {
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex items-center justify-end gap-1">
-                          <button onClick={() => openEdit(d)} className="text-slate-400 hover:text-[#EA4335] p-1.5 cursor-pointer" aria-label="Edit">
-                            <Pencil className="w-3.5 h-3.5" />
-                          </button>
-                          <button onClick={() => handleToggle(d.id)} className="text-slate-400 hover:text-[#EA4335] p-1.5 cursor-pointer" aria-label="Toggle active">
-                            <Power className="w-3.5 h-3.5" />
-                          </button>
+                          <Tooltip content="Edit distributor">
+                            <button onClick={() => openEdit(d)} className="text-slate-400 hover:text-[#EA4335] p-1.5 cursor-pointer" aria-label="Edit">
+                              <Edit size={14} />
+                            </button>
+                          </Tooltip>
+                          <Tooltip content={d.isActive ? 'Deactivate' : 'Activate'}>
+                            <button onClick={() => handleToggle(d.id)} className="text-slate-400 hover:text-[#EA4335] p-1.5 cursor-pointer" aria-label="Toggle active">
+                              <ToggleOn size={14} />
+                            </button>
+                          </Tooltip>
                         </div>
                       </td>
                     </tr>

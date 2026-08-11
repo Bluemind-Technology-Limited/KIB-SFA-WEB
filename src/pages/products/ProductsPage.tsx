@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Package, Pencil, Power, Boxes } from 'lucide-react';
+import { Box1, Box2, Edit, ToggleOn } from 'iconsax-reactjs';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
 import {
   loadProducts,
@@ -19,6 +19,7 @@ import { ErrorState } from '../../components/ui/ErrorState';
 import { Alert } from '../../components/ui/Alert';
 import { Modal } from '../../components/ui/Modal';
 import { Button } from '../../components/ui/Button';
+import { Tooltip } from '../../components/ui/Tooltip';
 import { FormField, inputClass } from '../../components/ui/FormField';
 import { formatCurrency } from '../../utils/format';
 
@@ -103,7 +104,7 @@ export function ProductsPage() {
       <PageHeader
         title="Products"
         subtitle="Manage the products the sales team can request from distributors."
-        actions={<Button onClick={openAdd} withPlusIcon>Add Product</Button>}
+        actions={<Button onClick={openAdd} withPlusIcon tooltip="Add a new product">Add Product</Button>}
       />
 
       {error && !dismissedError && (
@@ -146,7 +147,7 @@ export function ProductsPage() {
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2.5">
                           <div className="w-8 h-8 rounded-lg bg-[#EA4335]/10 flex items-center justify-center shrink-0">
-                            <Package className="w-4 h-4 text-[#EA4335]" />
+                            <Box1 size={16} className="text-[#EA4335]" />
                           </div>
                           <div>
                             <p className="text-xs font-bold text-[#171717] leading-none">{p.name}</p>
@@ -161,7 +162,7 @@ export function ProductsPage() {
                       <td className="px-4 py-3 text-xs font-semibold text-[#171717] text-right">{formatCurrency(p.price)}</td>
                       <td className="px-4 py-3 text-xs text-slate-600 text-right">
                         <span className="inline-flex items-center gap-1">
-                          <Boxes className="w-3 h-3 text-slate-400" /> {p.stock}
+                          <Box2 size={12} className="text-slate-400" /> {p.stock}
                         </span>
                       </td>
                       <td className="px-4 py-3">
@@ -177,12 +178,16 @@ export function ProductsPage() {
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex items-center justify-end gap-1">
-                          <button onClick={() => openEdit(p)} className="text-slate-400 hover:text-[#EA4335] p-1.5 cursor-pointer" aria-label="Edit">
-                            <Pencil className="w-3.5 h-3.5" />
-                          </button>
-                          <button onClick={() => handleToggle(p.id)} className="text-slate-400 hover:text-[#EA4335] p-1.5 cursor-pointer" aria-label="Toggle active">
-                            <Power className="w-3.5 h-3.5" />
-                          </button>
+                          <Tooltip content="Edit product">
+                            <button onClick={() => openEdit(p)} className="text-slate-400 hover:text-[#EA4335] p-1.5 cursor-pointer" aria-label="Edit">
+                              <Edit size={14} />
+                            </button>
+                          </Tooltip>
+                          <Tooltip content={p.isActive ? 'Deactivate' : 'Activate'}>
+                            <button onClick={() => handleToggle(p.id)} className="text-slate-400 hover:text-[#EA4335] p-1.5 cursor-pointer" aria-label="Toggle active">
+                              <ToggleOn size={14} />
+                            </button>
+                          </Tooltip>
                         </div>
                       </td>
                     </tr>

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
-import { ClipboardList } from 'lucide-react';
+import { ClipboardText } from 'iconsax-reactjs';
+import { useSearchParams } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
 import {
   loadRequests,
@@ -35,8 +36,19 @@ export function RequestsPage() {
   const reviewingId = useAppSelector(selectReviewingId);
   const error = useAppSelector(selectRequestError);
 
-  const [filter, setFilter] = useState<Filter>('ALL');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const filterParam = (searchParams.get('filter') ?? 'ALL') as Filter;
+  const filter: Filter = ['ALL', 'PENDING', 'APPROVED', 'REJECTED'].includes(filterParam)
+    ? filterParam
+    : 'ALL';
   const [dismissedError, setDismissedError] = useState(false);
+
+  const setFilter = (f: Filter) => {
+    const next = new URLSearchParams(searchParams);
+    if (f === 'ALL') next.delete('filter');
+    else next.set('filter', f);
+    setSearchParams(next, { replace: true });
+  };
 
   const load = useCallback(() => {
     dispatch(loadRequests());
@@ -139,7 +151,7 @@ export function RequestsPage() {
                       </td>
                       <td className="px-4 py-3 text-right">
                         <span className="inline-flex items-center gap-1 text-xs font-semibold text-[#EA4335]">
-                          <ClipboardList className="w-3.5 h-3.5" /> Review
+                          <ClipboardText size={14} /> Review
                         </span>
                       </td>
                     </tr>

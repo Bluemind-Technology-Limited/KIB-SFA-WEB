@@ -65,10 +65,10 @@ export function TableSkeleton({ cols, rows = 6, hasAvatar = true }: { cols: numb
 
 export function MetricSkeleton({ count = 4 }: { count?: number }) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+    <div className="grid grid-cols-2 md:grid-cols-2 xl:grid-cols-3 gap-3 md:gap-6">
       {Array.from({ length: count }).map((_, i) => (
-        <div key={i} className="bg-white border border-[#E9E9E9] rounded-lg flex items-center gap-3 px-4 py-4">
-          <Skeleton className="w-10 h-10 rounded-lg shrink-0" />
+        <div key={i} className="bg-white border border-[#E9E9E9] rounded-2xl flex items-center gap-3 px-3 py-3">
+          <Skeleton className="w-10 h-10 rounded-xl shrink-0" />
           <div className="flex-1 space-y-2">
             <Skeleton className="h-3 w-24" />
             <Skeleton className="h-5 w-14" />

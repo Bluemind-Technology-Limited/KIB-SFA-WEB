@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { AlertCircle, Eye, EyeOff, X } from 'lucide-react';
+import { CloseCircle, Eye, EyeSlash, InfoCircle } from 'iconsax-reactjs';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
 import { login, selectAuthError, selectAuthStatus } from '../../store/slices/authSlice';
 
@@ -37,10 +37,8 @@ export function LoginPage() {
     <div className="min-h-screen w-full flex flex-col bg-[#FAFAFA] text-[#171717] font-sans">
       <header className="w-full max-w-[1440px] mx-auto px-4 md:px-6 py-4 flex items-center justify-between h-16">
         <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-lg bg-[#EA4335] flex items-center justify-center text-white font-bold text-lg">
-            K
-          </div>
-          <span className="text-sm font-bold text-[#171717]">KIB Sales Force</span>
+          <img src="/kib-group.png" alt="KIB Group" className="h-9 w-auto object-contain" />
+          <span className="text-sm font-bold text-[#171717] hidden sm:inline">Sales Force Automation</span>
         </div>
       </header>
 
@@ -48,7 +46,7 @@ export function LoginPage() {
         {(error || serverError) && (
           <div className="fixed bottom-6 right-6 z-[100] w-[calc(100%-3rem)] max-w-sm">
             <div className="flex items-start gap-2.5 bg-white text-[#171717] px-4 py-3 rounded-xl border border-[#E9E9E9] shadow-lg">
-              <AlertCircle className="w-4 h-4 text-[#EA4335] shrink-0 mt-0.5" />
+              <InfoCircle size={16} className="text-[#EA4335] shrink-0 mt-0.5" variant="Bold" />
               <p className="text-xs font-medium leading-5 flex-1">{error || serverError}</p>
               <button
                 type="button"
@@ -56,13 +54,13 @@ export function LoginPage() {
                 className="text-slate-400 hover:text-slate-600 shrink-0 transition-colors cursor-pointer"
                 aria-label="Dismiss"
               >
-                <X className="w-3.5 h-3.5" />
+                <CloseCircle size={14} />
               </button>
             </div>
           </div>
         )}
 
-        <div className="w-[448px] max-w-full bg-white rounded-2xl p-10 border border-slate-200 flex flex-col gap-4">
+        <div className="w-[448px] max-w-full bg-white rounded-2xl p-5 border border-slate-200 flex flex-col gap-3">
           <h2 className="text-[23px] font-semibold text-[#171717] tracking-tight leading-8">
             Sign in to the admin portal
           </h2>
@@ -70,7 +68,7 @@ export function LoginPage() {
             Manage distributors, sales users, products and requests across the platform.
           </p>
 
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <form onSubmit={handleSubmit} className="flex flex-col gap-3">
             <div className="flex flex-col gap-2">
               <label className="text-xs font-semibold text-[#171717] leading-5 tracking-tight">Email</label>
               <input
@@ -104,7 +102,7 @@ export function LoginPage() {
                   aria-label={showPassword ? 'Hide password' : 'Show password'}
                   tabIndex={-1}
                 >
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  {showPassword ? <EyeSlash size={16} /> : <Eye size={16} />}
                 </button>
               </div>
             </div>

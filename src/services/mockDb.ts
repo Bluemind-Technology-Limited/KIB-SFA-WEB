@@ -28,7 +28,7 @@ export const users: User[] = [
   {
     id: 'admin_1',
     role: 'SUPER_ADMIN',
-    fullName: 'Jerry Japheth',
+    fullName: 'Japheth Jerry',
     email: 'admin@kibgroup.app',
     password: 'password',
     distributorId: null,

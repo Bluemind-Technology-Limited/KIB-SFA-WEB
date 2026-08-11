@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Mail, Phone, Pencil, Power } from 'lucide-react';
+import { Call, DirectInbox, Edit, ToggleOn } from 'iconsax-reactjs';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
 import {
   loadSalesUsers,
@@ -24,6 +24,7 @@ import { ErrorState } from '../../components/ui/ErrorState';
 import { Alert } from '../../components/ui/Alert';
 import { Modal } from '../../components/ui/Modal';
 import { Button } from '../../components/ui/Button';
+import { Tooltip } from '../../components/ui/Tooltip';
 import { Avatar } from '../../components/ui/Avatar';
 import { FormField, inputClass } from '../../components/ui/FormField';
 
@@ -110,7 +111,7 @@ export function SalesUsersPage() {
       <PageHeader
         title="Sales Users"
         subtitle="Create, edit and assign the sales team to distributors."
-        actions={<Button onClick={openAdd} withPlusIcon>Add Sales User</Button>}
+        actions={<Button onClick={openAdd} withPlusIcon tooltip="Add a new sales user">Add Sales User</Button>}
       />
 
       {error && !dismissedError && (
@@ -156,10 +157,10 @@ export function SalesUsersPage() {
                       </td>
                       <td className="px-4 py-3">
                         <p className="text-xs text-slate-600 flex items-center gap-1.5">
-                          <Mail className="w-3 h-3 text-slate-400" /> {u.email}
+                          <DirectInbox size={12} className="text-slate-400" /> {u.email}
                         </p>
                         <p className="text-[10px] text-slate-400 flex items-center gap-1.5 mt-0.5">
-                          <Phone className="w-2.5 h-2.5" /> {u.phone || '—'}
+                          <Call size={10} /> {u.phone || '—'}
                         </p>
                       </td>
                       <td className="px-4 py-3">
@@ -186,12 +187,16 @@ export function SalesUsersPage() {
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex items-center justify-end gap-1">
-                          <button onClick={() => openEdit(u)} className="text-slate-400 hover:text-[#EA4335] p-1.5 cursor-pointer" aria-label="Edit">
-                            <Pencil className="w-3.5 h-3.5" />
-                          </button>
-                          <button onClick={() => handleToggle(u.id)} className="text-slate-400 hover:text-[#EA4335] p-1.5 cursor-pointer" aria-label="Toggle active">
-                            <Power className="w-3.5 h-3.5" />
-                          </button>
+                          <Tooltip content="Edit sales user">
+                            <button onClick={() => openEdit(u)} className="text-slate-400 hover:text-[#EA4335] p-1.5 cursor-pointer" aria-label="Edit">
+                              <Edit size={14} />
+                            </button>
+                          </Tooltip>
+                          <Tooltip content={u.isActive ? 'Deactivate' : 'Activate'}>
+                            <button onClick={() => handleToggle(u.id)} className="text-slate-400 hover:text-[#EA4335] p-1.5 cursor-pointer" aria-label="Toggle active">
+                              <ToggleOn size={14} />
+                            </button>
+                          </Tooltip>
                         </div>
                       </td>
                     </tr>

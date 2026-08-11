@@ -1,10 +1,20 @@
 import { useState } from 'react';
-import { Check, X, FileText, Building2 } from 'lucide-react';
+import { Buildings2, CloseCircle, DocumentText, TickCircle } from 'iconsax-reactjs';
 import type { ProductRequest } from '../../types/domain';
 import { formatCurrency, formatDateTime } from '../../utils/format';
 import { StatusBadge } from '../ui/Badge';
 import { Avatar } from '../ui/Avatar';
 import { Button } from '../ui/Button';
+
+type RejectionReason = { value: string };
+
+const REJECTION_PRESETS: RejectionReason[] = [
+  { value: 'Out of stock' },
+  { value: 'Incorrect quantity' },
+  { value: 'Discontinued product' },
+  { value: 'Pricing discrepancy' },
+  { value: 'Insufficient details' },
+];
 
 interface RequestDetailProps {
   request: ProductRequest;
@@ -24,6 +34,8 @@ export function RequestDetail({ request, reviewing, onReview, showReview = true 
 
   const isPending = request.status === 'PENDING';
 
+  const applyPreset = (value: string) => setRejectionNote(value);
+
   return (
     <div className="flex flex-col gap-5">
       <div className="flex items-start justify-between gap-4">
@@ -39,12 +51,12 @@ export function RequestDetail({ request, reviewing, onReview, showReview = true 
 
       <div className="flex flex-col sm:flex-row sm:items-center gap-2 text-xs text-slate-500">
         <span className="flex items-center gap-1.5">
-          <FileText className="w-3.5 h-3.5" />
+          <DocumentText size={14} />
           <span className="font-mono font-semibold text-slate-700">{request.id.toUpperCase()}</span>
         </span>
         <span className="hidden sm:inline text-slate-300">·</span>
         <span className="flex items-center gap-1.5">
-          <Building2 className="w-3.5 h-3.5" />
+          <Buildings2 size={14} />
           <span>{request.distributorName}</span>
         </span>
       </div>
@@ -91,15 +103,16 @@ export function RequestDetail({ request, reviewing, onReview, showReview = true 
         <div className="border-t border-[#E9E9E9] pt-4">
           {!showRejectForm ? (
             <div className="flex flex-col sm:flex-row gap-3 sm:items-center justify-end">
-              <Button variant="danger" onClick={() => setShowRejectForm(true)} disabled={reviewing}>
+              <Button variant="danger" onClick={() => setShowRejectForm(true)} disabled={reviewing} tooltip="Reject this request">
                 Reject
               </Button>
               <Button
                 onClick={() => onReview('APPROVED')}
                 disabled={reviewing}
+                tooltip="Approve this request"
               >
                 <span className="flex items-center gap-1.5 text-white text-xs font-semibold">
-                  <Check className="w-3.5 h-3.5" /> Approve Request
+                  <TickCircle size={14} /> Approve Request
                 </span>
               </Button>
             </div>
@@ -114,20 +127,39 @@ export function RequestDetail({ request, reviewing, onReview, showReview = true 
               <label className="text-xs font-semibold text-[#171717]">
                 Reason for rejection <span className="text-slate-400 font-normal">(optional)</span>
               </label>
+              <div className="flex flex-wrap gap-1.5">
+                {REJECTION_PRESETS.map((preset) => {
+                  const active = rejectionNote === preset.value;
+                  return (
+                    <button
+                      key={preset.value}
+                      type="button"
+                      onClick={() => applyPreset(preset.value)}
+                      className={`text-[11px] font-medium rounded-full border px-2.5 py-1 transition-colors cursor-pointer ${
+                        active
+                          ? 'bg-rose-50 border-[#EA4335] text-[#EA4335]'
+                          : 'border-[#E9E9E9] text-slate-500 hover:border-[#EA4335] hover:text-[#EA4335]'
+                      }`}
+                    >
+                      {preset.value}
+                    </button>
+                  );
+                })}
+              </div>
               <textarea
                 value={rejectionNote}
                 onChange={(e) => setRejectionNote(e.target.value)}
                 rows={2}
-                placeholder="e.g. Out of stock…"
+                placeholder="Or type your own reason…"
                 className="w-full rounded-lg border border-[#E9E9E9] px-3 py-2 text-xs focus:outline-none focus:border-[#EA4335] resize-none"
               />
               <div className="flex justify-end gap-2">
                 <Button variant="secondary" onClick={() => setShowRejectForm(false)} type="button">
                   Cancel
                 </Button>
-                <Button type="submit" variant="danger" disabled={reviewing}>
+                <Button type="submit" variant="danger" disabled={reviewing} tooltip="Reject this request">
                   <span className="flex items-center gap-1.5 text-white text-xs font-semibold">
-                    <X className="w-3.5 h-3.5" /> Reject
+                    <CloseCircle size={14} /> Reject
                   </span>
                 </Button>
               </div>

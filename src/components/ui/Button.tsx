@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
-import { Plus } from 'lucide-react';
+import { Add } from 'iconsax-reactjs';
+import { Tooltip } from './Tooltip';
 
 interface ButtonProps {
   children: ReactNode;
@@ -10,6 +11,8 @@ interface ButtonProps {
   size?: 'sm' | 'md';
   fullWidth?: boolean;
   withPlusIcon?: boolean;
+  tooltip?: string;
+  setTooltipSide?: 'top' | 'right' | 'bottom' | 'left';
   className?: string;
 }
 
@@ -23,13 +26,15 @@ export function Button({
   size = 'md',
   fullWidth,
   withPlusIcon,
+  tooltip,
+  setTooltipSide = 'top',
   className = '',
 }: ButtonProps) {
   const sizeClass = size === 'sm' ? 'h-8 px-3 text-xs' : 'h-9 px-4 text-xs';
   const widthClass = fullWidth ? 'w-full' : '';
 
-  if (variant === 'secondary') {
-    return (
+  const inner =
+    variant === 'secondary' ? (
       <button
         type={type}
         onClick={onClick}
@@ -38,11 +43,7 @@ export function Button({
       >
         {children}
       </button>
-    );
-  }
-
-  if (variant === 'danger') {
-    return (
+    ) : variant === 'danger' ? (
       <button
         type={type}
         onClick={onClick}
@@ -51,15 +52,26 @@ export function Button({
       >
         {children}
       </button>
+    ) : (
+      <button
+        type={type}
+        onClick={onClick}
+        disabled={disabled}
+        className={`btn-3d ${sizeClass} ${widthClass} ${className}`}
+      >
+        <span className="flex items-center gap-1.5 text-white text-xs font-semibold">
+          {withPlusIcon && <Add size={14} />}
+          {children}
+        </span>
+      </button>
+    );
+
+  if (tooltip) {
+    return (
+      <Tooltip content={tooltip} side={setTooltipSide}>
+        {inner}
+      </Tooltip>
     );
   }
-
-  return (
-    <button type={type} onClick={onClick} disabled={disabled} className={`btn-3d ${sizeClass} ${widthClass} ${className}`}>
-      <span className="flex items-center gap-1.5 text-white text-xs font-semibold">
-        {withPlusIcon && <Plus className="w-3.5 h-3.5" />}
-        {children}
-      </span>
-    </button>
-  );
+  return inner;
 }
