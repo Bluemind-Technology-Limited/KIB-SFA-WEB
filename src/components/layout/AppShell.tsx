@@ -84,7 +84,7 @@ export function AppShell() {
                 className={({ isActive }) =>
                   `w-full flex items-center justify-center py-2 rounded-lg transition-colors cursor-pointer ${
                     isActive
-                      ? 'bg-[#FDEDEB] text-[#EA4335] border border-[#EA4335]/30 shadow-sm'
+                      ? 'bg-[#FDEDEB] text-[#EA4335] border border-[#EA4335]/30'
                       : 'text-[#171717] hover:bg-[#FDF0EE] hover:text-[#EA4335]'
                   } ${collapsed ? '' : 'gap-3 px-3 justify-start'}`
                 }
@@ -120,9 +120,7 @@ export function AppShell() {
           <Tooltip content="Sign Out" side="right">
             <button
               onClick={handleLogout}
-              className={`w-full flex items-center gap-2 py-2 border border-slate-200 hover:bg-rose-50/50 text-slate-600 hover:text-rose-600 text-xs font-semibold rounded-lg transition-all cursor-pointer bg-white ${
-                collapsed ? 'justify-center px-0' : 'px-3 justify-start'
-              }`}
+              className={`w-full flex items-center justify-center gap-2 px-3 py-2 border border-slate-200 hover:bg-rose-50/50 text-slate-600 hover:text-rose-600 text-xs font-semibold rounded-lg transition-all cursor-pointer bg-white`}
             >
               <Logout size={15} />
               {!collapsed && <span>Sign Out</span>}
