@@ -1,0 +1,176 @@
+import { useCallback, useEffect, useState } from 'react';
+import { ClipboardList } from 'lucide-react';
+import { useAppDispatch, useAppSelector } from '../../hooks/redux';
+import {
+  loadRequests,
+  openRequest,
+  reviewRequest,
+  clearSelected,
+  clearRequestError,
+  selectRequests,
+  selectRequestsStatus,
+  selectSelectedRequest,
+  selectReviewingId,
+  selectRequestError,
+} from '../../store/slices/requestSlice';
+import { PageHeader } from '../../components/ui/PageHeader';
+import { TableSkeleton } from '../../components/ui/Skeleton';
+import { EmptyState } from '../../components/ui/EmptyState';
+import { ErrorState } from '../../components/ui/ErrorState';
+import { Alert } from '../../components/ui/Alert';
+import { StatusBadge } from '../../components/ui/Badge';
+import { Avatar } from '../../components/ui/Avatar';
+import { Modal } from '../../components/ui/Modal';
+import { RequestDetail } from '../../components/requests/RequestDetail';
+import { formatCurrency, timeAgo } from '../../utils/format';
+
+type Filter = 'ALL' | 'PENDING' | 'APPROVED' | 'REJECTED';
+
+/** Request board — the Super Admin sees every request across all distributors. */
+export function RequestsPage() {
+  const dispatch = useAppDispatch();
+  const requests = useAppSelector(selectRequests);
+  const status = useAppSelector(selectRequestsStatus);
+  const selected = useAppSelector(selectSelectedRequest);
+  const reviewingId = useAppSelector(selectReviewingId);
+  const error = useAppSelector(selectRequestError);
+
+  const [filter, setFilter] = useState<Filter>('ALL');
+  const [dismissedError, setDismissedError] = useState(false);
+
+  const load = useCallback(() => {
+    dispatch(loadRequests());
+  }, [dispatch]);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  useEffect(() => {
+    setDismissedError(false);
+  }, [status]);
+
+  const handleReview = (id: string, decisionStatus: 'APPROVED' | 'REJECTED', notes?: string) => {
+    dispatch(reviewRequest({ id, decision: { status: decisionStatus, notes } }));
+  };
+
+  const filtered = requests.filter((r) => filter === 'ALL' || r.status === filter);
+  const loading = status === 'loading';
+  const showError = status === 'failed' && !dismissedError;
+
+  return (
+    <div className="space-y-6">
+      <PageHeader
+        title="All Requests"
+        subtitle="View and manage product requests across all distributors and sales users."
+      />
+
+      {showError && (
+        <Alert
+          message={error || 'Failed to load requests.'}
+          onDismiss={() => {
+            setDismissedError(true);
+            dispatch(clearRequestError());
+          }}
+        />
+      )}
+
+      <div className="flex flex-wrap gap-2">
+        {(['ALL', 'PENDING', 'APPROVED', 'REJECTED'] as const).map((f) => (
+          <button
+            key={f}
+            onClick={() => setFilter(f)}
+            className={`h-8 px-3.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer border ${
+              filter === f
+                ? 'bg-[#171717] text-white border-[#171717]'
+                : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
+            }`}
+          >
+            {f === 'ALL' ? 'All' : f.toLowerCase()}
+          </button>
+        ))}
+      </div>
+
+      {status === 'failed' ? (
+        <div className="bg-white border border-[#E9E9E9] rounded-xl overflow-hidden">
+          <ErrorState title="Could not load requests" message={error || 'Something went wrong.'} onRetry={load} />
+        </div>
+      ) : loading ? (
+        <TableSkeleton cols={6} rows={6} hasAvatar />
+      ) : (
+        <div className="bg-white border border-[#E9E9E9] rounded-xl overflow-hidden">
+          {filtered.length === 0 ? (
+            <EmptyState title="No requests found" hint="No requests match the current filter." />
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left">
+                <thead>
+                  <tr className="border-b border-slate-100 text-[10px] uppercase tracking-wider text-slate-400">
+                    <th className="px-4 py-3 font-semibold">Sales User</th>
+                    <th className="px-4 py-3 font-semibold">Distributor</th>
+                    <th className="px-4 py-3 font-semibold">Items</th>
+                    <th className="px-4 py-3 font-semibold">Total</th>
+                    <th className="px-4 py-3 font-semibold">Submitted</th>
+                    <th className="px-4 py-3 font-semibold">Status</th>
+                    <th className="px-4 py-3 font-semibold text-right">View</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filtered.map((req) => (
+                    <tr
+                      key={req.id}
+                      className="border-b border-slate-50 hover:bg-slate-50/50 cursor-pointer"
+                      onClick={() => dispatch(openRequest(req.id))}
+                    >
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-2.5">
+                          <Avatar name={req.salesUserName} size="sm" />
+                          <p className="text-xs font-bold text-[#171717] leading-none">{req.salesUserName}</p>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className="text-xs text-slate-600 max-w-[160px] truncate block">{req.distributorName}</span>
+                      </td>
+                      <td className="px-4 py-3 text-xs text-slate-600">{req.items.length} item{req.items.length === 1 ? '' : 's'}</td>
+                      <td className="px-4 py-3 text-xs font-semibold text-[#171717]">{formatCurrency(req.totalAmount)}</td>
+                      <td className="px-4 py-3 text-xs text-slate-500">{timeAgo(req.createdAt)}</td>
+                      <td className="px-4 py-3">
+                        <StatusBadge status={req.status} />
+                      </td>
+                      <td className="px-4 py-3 text-right">
+                        <span className="inline-flex items-center gap-1 text-xs font-semibold text-[#EA4335]">
+                          <ClipboardList className="w-3.5 h-3.5" /> Review
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      )}
+
+      {selected && (
+        <Modal onClose={() => dispatch(clearSelected())} maxWidth="max-w-2xl">
+          <div className="kib-scroll bg-white rounded-xl w-full p-6 max-h-[85vh] overflow-y-auto overscroll-contain">
+            <RequestDetail
+              request={selected}
+              reviewing={reviewingId === selected.id}
+              onReview={(decisionStatus, notes) => handleReview(selected.id, decisionStatus, notes)}
+            />
+            <div className="flex justify-end mt-5">
+              <button
+                type="button"
+                onClick={() => dispatch(clearSelected())}
+                className="text-slate-400 hover:text-slate-600 text-xs font-semibold cursor-pointer"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </Modal>
+      )}
+    </div>
+  );
+}
