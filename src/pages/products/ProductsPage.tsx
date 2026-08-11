@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { AnimatePresence } from 'framer-motion';
 import { Box1, Box2, Edit, ToggleOff, ToggleOn } from 'iconsax-reactjs';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
 import {
@@ -214,9 +215,10 @@ export function ProductsPage() {
         </div>
       )}
 
+      <AnimatePresence>
       {showModal && (
-        <Modal onClose={() => setShowModal(false)}>
-          <form onSubmit={submit} className="kib-scroll bg-white rounded-xl w-full max-w-md p-5 space-y-4 max-h-[85vh] overflow-y-auto overscroll-contain">
+        <Modal onClose={() => setShowModal(false)} maxWidth="max-w-xl">
+          <form onSubmit={submit} className="kib-scroll bg-white rounded-xl w-full max-w-xl p-5 space-y-4 max-h-[85vh] overflow-y-auto overscroll-contain">
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-bold text-[#171717]">{editing ? 'Edit Product' : 'Add Product'}</h3>
               <button type="button" onClick={() => setShowModal(false)} className="text-slate-400 hover:text-slate-600 cursor-pointer">
@@ -254,6 +256,7 @@ export function ProductsPage() {
           </form>
         </Modal>
       )}
+      </AnimatePresence>
     </div>
   );
 }

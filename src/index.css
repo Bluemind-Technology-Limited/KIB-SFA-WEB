@@ -48,8 +48,8 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* iOS-style focus ring for interactive controls. */
-.focus-native {
+/* iOS-style focus ring for interactive controls (keyboard-only, not mouse clicks). */
+.focus-native:focus-visible {
   outline: 2px solid var(--color-accent-focus);
   outline-offset: 2px;
 }

@@ -134,7 +134,7 @@ export function RequestDetail({ request, reviewing, onReview, showReview = true 
                       key={preset.value}
                       type="button"
                       onClick={() => applyPreset(preset.value)}
-                      className={`text-[11px] font-medium rounded-full border px-2.5 py-1 transition-colors cursor-pointer ${
+                      className={`text-[11px] font-medium rounded-lg border px-2.5 py-1 transition-colors cursor-pointer ${
                         active
                           ? 'bg-rose-50 border-[#EA4335] text-[#EA4335]'
                           : 'border-[#E9E9E9] text-slate-500 hover:border-[#EA4335] hover:text-[#EA4335]'

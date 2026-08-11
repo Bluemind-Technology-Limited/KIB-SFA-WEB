@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { AnimatePresence } from 'framer-motion';
 import { Buildings2, Call, DirectInbox, Edit, ToggleOff, ToggleOn } from 'iconsax-reactjs';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
 import {
@@ -198,9 +199,10 @@ export function DistributorsPage() {
         </div>
       )}
 
+      <AnimatePresence>
       {showModal && (
-        <Modal onClose={() => setShowModal(false)} maxWidth="max-w-lg">
-          <form onSubmit={submit} className="kib-scroll bg-white rounded-xl w-full max-w-lg p-5 space-y-4 max-h-[85vh] overflow-y-auto overscroll-contain">
+        <Modal onClose={() => setShowModal(false)} maxWidth="max-w-xl">
+          <form onSubmit={submit} className="kib-scroll bg-white rounded-xl w-full max-w-xl p-5 space-y-4 max-h-[85vh] overflow-y-auto overscroll-contain">
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-bold text-[#171717]">
                 {editing ? 'Edit Distributor' : 'Add Distributor'}
@@ -237,6 +239,7 @@ export function DistributorsPage() {
           </form>
         </Modal>
       )}
+      </AnimatePresence>
     </div>
   );
 }

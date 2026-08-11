@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { AnimatePresence } from 'framer-motion';
 import { ClipboardText } from 'iconsax-reactjs';
 import { useSearchParams } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
@@ -178,9 +179,10 @@ export function RequestsPage() {
         </div>
       )}
 
+      <AnimatePresence>
       {selected && (
         <Modal onClose={() => dispatch(clearSelected())} maxWidth="max-w-2xl">
-          <div className="kib-scroll bg-white rounded-xl w-full p-6 max-h-[85vh] overflow-y-auto overscroll-contain">
+          <div className="kib-scroll bg-white rounded-2xl w-full p-6 max-h-[85vh] overflow-y-auto overscroll-contain">
             <RequestDetail
               request={selected}
               reviewing={reviewingId === selected.id}
@@ -198,6 +200,7 @@ export function RequestsPage() {
           </div>
         </Modal>
       )}
+      </AnimatePresence>
     </div>
   );
 }
