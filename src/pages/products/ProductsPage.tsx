@@ -20,7 +20,11 @@ import { Alert } from '../../components/ui/Alert';
 import { Modal } from '../../components/ui/Modal';
 import { Button } from '../../components/ui/Button';
 import { Tooltip } from '../../components/ui/Tooltip';
+import { Paginator } from '../../components/ui/Paginator';
+import { usePagination } from '../../hooks/usePagination';
 import { FormField, inputClass } from '../../components/ui/FormField';
+
+const PAGE_SIZE = 10;
 import { formatCurrency } from '../../utils/format';
 
 interface FormState {
@@ -98,13 +102,15 @@ export function ProductsPage() {
   const handleToggle = (id: string) => dispatch(toggleProduct(id));
 
   const loading = status === 'loading' && list.length === 0;
+  const pagination = usePagination(PAGE_SIZE, list.length, status);
+  const paged = pagination.slice(list);
 
   return (
     <div className="space-y-6">
       <PageHeader
         title="Products"
         subtitle="Manage the products the sales team can request from distributors."
-        actions={<Button onClick={openAdd} withPlusIcon tooltip="Add a new product">Add Product</Button>}
+        actions={<Button onClick={openAdd} withPlusIcon>Add Product</Button>}
       />
 
       {error && !dismissedError && (
@@ -128,6 +134,7 @@ export function ProductsPage() {
           {list.length === 0 ? (
             <EmptyState title="No products yet" hint="Add products to make them available to the sales team." />
           ) : (
+            <>
             <div className="overflow-x-auto">
               <table className="w-full text-left">
                 <thead>
@@ -142,7 +149,7 @@ export function ProductsPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {list.map((p) => (
+                  {paged.map((p) => (
                     <tr key={p.id} className="border-b border-slate-50 hover:bg-slate-50/50">
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2.5">
@@ -194,7 +201,15 @@ export function ProductsPage() {
                   ))}
                 </tbody>
               </table>
-            </div>
+              </div>
+              <Paginator
+                page={pagination.page}
+                pageCount={pagination.pageCount}
+                pageSize={PAGE_SIZE}
+                total={pagination.total}
+                onChange={pagination.onPageChange}
+              />
+            </>
           )}
         </div>
       )}

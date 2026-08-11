@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { ArrowRight, Box1, Buildings2, ClipboardText, CloseCircle, DirectboxReceive, Profile2User, TickCircle } from 'iconsax-reactjs';
+import { ArrowRight2, Box1, Buildings2, ClipboardText, CloseCircle, DirectboxReceive, Profile2User, TickCircle } from 'iconsax-reactjs';
 import { Link } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
 import { selectUser } from '../../store/slices/authSlice';
@@ -68,7 +68,7 @@ export function DashboardPage() {
         <MetricSkeleton count={6} />
       ) : (
         metrics && (
-          <div className="grid grid-cols-2 md:grid-cols-2 xl:grid-cols-3 gap-3 md:gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-2 xl:grid-cols-3 gap-2.5 md:gap-4">
             <MetricCard label="Distributors" icon={<Buildings2 size={16} className="text-[#EA4335]" />} value={metrics.totalDistributors} sub="on platform" />
             <MetricCard label="Sales Users" icon={<Profile2User size={16} className="text-sky-600" />} value={metrics.totalSales} sub="active reps" />
             <MetricCard label="Products" icon={<Box1 size={16} className="text-violet-600" />} value={metrics.totalProducts} sub="catalogue" />
@@ -87,7 +87,7 @@ export function DashboardPage() {
             <span className="text-xs font-semibold text-[#737373]">Recent Requests</span>
           </div>
           <Link to="/requests" className="text-xs font-semibold text-[#EA4335] flex items-center gap-1 hover:underline">
-            View all <ArrowRight size={12} />
+            View all <ArrowRight2 size={12} />
           </Link>
         </div>
 

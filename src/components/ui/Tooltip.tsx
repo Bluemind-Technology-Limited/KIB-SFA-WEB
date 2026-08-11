@@ -5,6 +5,7 @@ interface TooltipProps {
   content: string;
   side?: 'top' | 'right' | 'bottom' | 'left';
   children: ReactNode;
+  className?: string;
 }
 
 const GAP = 8;
@@ -15,7 +16,7 @@ const GAP = 8;
  * computed from the wrapped element's and the tooltip's own measured sizes, and
  * flips when near the viewport edge.
  */
-export function Tooltip({ content, side = 'top', children }: TooltipProps) {
+export function Tooltip({ content, side = 'top', children, className }: TooltipProps) {
   const wrapRef = useRef<HTMLSpanElement>(null);
   const tipRef = useRef<HTMLSpanElement>(null);
   const [open, setOpen] = useState(false);
@@ -65,7 +66,7 @@ export function Tooltip({ content, side = 'top', children }: TooltipProps) {
   return (
     <span
       ref={wrapRef}
-      className="relative inline-block"
+      className={`relative inline-block ${className ?? ''}`}
       onMouseEnter={() => setOpen(true)}
       onMouseLeave={() => setOpen(false)}
       onFocus={() => setOpen(true)}

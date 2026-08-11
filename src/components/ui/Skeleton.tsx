@@ -40,7 +40,7 @@ export function TableRowSkeleton({ cols, hasAvatar = true }: { cols: number; has
 
 export function TableSkeleton({ cols, rows = 6, hasAvatar = true }: { cols: number; rows?: number; hasAvatar?: boolean }) {
   return (
-    <div className="bg-white border border-[#E9E9E9] rounded-xl overflow-hidden">
+    <div className="bg-surface border border-border-soft rounded-xl overflow-hidden">
       <div className="overflow-x-auto">
         <table className="w-full text-left">
           <thead>
@@ -65,13 +65,13 @@ export function TableSkeleton({ cols, rows = 6, hasAvatar = true }: { cols: numb
 
 export function MetricSkeleton({ count = 4 }: { count?: number }) {
   return (
-    <div className="grid grid-cols-2 md:grid-cols-2 xl:grid-cols-3 gap-3 md:gap-6">
+    <div className="grid grid-cols-2 md:grid-cols-2 xl:grid-cols-3 gap-2.5 md:gap-4">
       {Array.from({ length: count }).map((_, i) => (
-        <div key={i} className="bg-white border border-[#E9E9E9] rounded-2xl flex items-center gap-3 px-3 py-3">
+        <div key={i} className="bg-surface border border-border-soft rounded-2xl flex items-center gap-3 px-3 py-3 overflow-hidden">
           <Skeleton className="w-10 h-10 rounded-xl shrink-0" />
-          <div className="flex-1 space-y-2">
-            <Skeleton className="h-3 w-24" />
-            <Skeleton className="h-5 w-14" />
+          <div className="flex-1 min-w-0 space-y-2">
+            <Skeleton className="h-3 w-3/4 max-w-[7rem]" />
+            <Skeleton className="h-5 w-1/2 max-w-[4.5rem]" />
           </div>
         </div>
       ))}

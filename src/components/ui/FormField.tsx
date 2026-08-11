@@ -20,4 +20,4 @@ export function FormField({ label, required, children, span }: FormFieldProps) {
 
 /** Standard text input styling shared by all forms. */
 export const inputClass =
-  'h-9 w-full rounded-lg border border-[#E9E9E9] px-3 text-xs focus:outline-none focus:border-[#EA4335] bg-white';
+  'h-9 w-full rounded-lg border border-border-soft px-3 text-xs focus:outline-none focus:border-accent bg-surface';

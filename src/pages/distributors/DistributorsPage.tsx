@@ -20,7 +20,11 @@ import { Alert } from '../../components/ui/Alert';
 import { Modal } from '../../components/ui/Modal';
 import { Button } from '../../components/ui/Button';
 import { Tooltip } from '../../components/ui/Tooltip';
+import { Paginator } from '../../components/ui/Paginator';
+import { usePagination } from '../../hooks/usePagination';
 import { FormField, inputClass } from '../../components/ui/FormField';
+
+const PAGE_SIZE = 10;
 
 interface FormState {
   name: string;
@@ -85,13 +89,15 @@ export function DistributorsPage() {
   };
 
   const loading = status === 'loading' && list.length === 0;
+  const pagination = usePagination(PAGE_SIZE, list.length, status);
+  const paged = pagination.slice(list);
 
   return (
     <div className="space-y-6">
       <PageHeader
         title="Distributors"
         subtitle="Create and manage the distributors sales users are assigned to."
-        actions={<Button onClick={openAdd} withPlusIcon tooltip="Add a new distributor">Add Distributor</Button>}
+        actions={<Button onClick={openAdd} withPlusIcon>Add Distributor</Button>}
       />
 
       {error && !dismissedError && (
@@ -115,6 +121,7 @@ export function DistributorsPage() {
           {list.length === 0 ? (
             <EmptyState title="No distributors yet" hint="Add your first distributor to get started." />
           ) : (
+            <>
             <div className="overflow-x-auto">
               <table className="w-full text-left">
                 <thead>
@@ -127,7 +134,7 @@ export function DistributorsPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {list.map((d) => (
+                  {paged.map((d) => (
                     <tr key={d.id} className="border-b border-slate-50 hover:bg-slate-50/50">
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2.5">
@@ -144,7 +151,7 @@ export function DistributorsPage() {
                         <p className="text-xs text-slate-600 flex items-center gap-1.5">
                           <DirectInbox size={12} className="text-slate-400" /> {d.email}
                         </p>
-                        <p className="text-[10px] text-slate-400 flex items-center gap-1.5 mt-0.5">
+                        <p className="text-[10px] text-slate-400 flex items-center gap-1.5 mt-0.5 whitespace-nowrap">
                           <Call size={10} /> {d.phone}
                         </p>
                       </td>
@@ -179,13 +186,21 @@ export function DistributorsPage() {
                 </tbody>
               </table>
             </div>
+            <Paginator
+              page={pagination.page}
+              pageCount={pagination.pageCount}
+              pageSize={PAGE_SIZE}
+              total={pagination.total}
+              onChange={pagination.onPageChange}
+            />
+            </>
           )}
         </div>
       )}
 
       {showModal && (
-        <Modal onClose={() => setShowModal(false)}>
-          <form onSubmit={submit} className="kib-scroll bg-white rounded-xl w-full max-w-md p-5 space-y-4 max-h-[85vh] overflow-y-auto overscroll-contain">
+        <Modal onClose={() => setShowModal(false)} maxWidth="max-w-lg">
+          <form onSubmit={submit} className="kib-scroll bg-white rounded-xl w-full max-w-lg p-5 space-y-4 max-h-[85vh] overflow-y-auto overscroll-contain">
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-bold text-[#171717]">
                 {editing ? 'Edit Distributor' : 'Add Distributor'}

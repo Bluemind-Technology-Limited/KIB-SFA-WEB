@@ -103,16 +103,15 @@ export function RequestDetail({ request, reviewing, onReview, showReview = true 
         <div className="border-t border-[#E9E9E9] pt-4">
           {!showRejectForm ? (
             <div className="flex flex-col sm:flex-row gap-3 sm:items-center justify-end">
-              <Button variant="danger" onClick={() => setShowRejectForm(true)} disabled={reviewing} tooltip="Reject this request">
+              <Button variant="danger" onClick={() => setShowRejectForm(true)} disabled={reviewing}>
                 Reject
               </Button>
               <Button
                 onClick={() => onReview('APPROVED')}
                 disabled={reviewing}
-                tooltip="Approve this request"
               >
                 <span className="flex items-center gap-1.5 text-white text-xs font-semibold">
-                  <TickCircle size={14} /> Approve Request
+                  <TickCircle size={14} variant="Bold" /> Approve Request
                 </span>
               </Button>
             </div>
@@ -157,7 +156,7 @@ export function RequestDetail({ request, reviewing, onReview, showReview = true 
                 <Button variant="secondary" onClick={() => setShowRejectForm(false)} type="button">
                   Cancel
                 </Button>
-                <Button type="submit" variant="danger" disabled={reviewing} tooltip="Reject this request">
+                <Button type="submit" variant="danger" disabled={reviewing}>
                   <span className="flex items-center gap-1.5 text-white text-xs font-semibold">
                     <CloseCircle size={14} /> Reject
                   </span>

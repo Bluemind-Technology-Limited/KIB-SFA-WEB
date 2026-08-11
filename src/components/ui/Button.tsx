@@ -39,7 +39,7 @@ export function Button({
         type={type}
         onClick={onClick}
         disabled={disabled}
-        className={`${sizeClass} ${widthClass} border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg text-xs font-semibold text-slate-700 inline-flex items-center justify-center gap-1.5 cursor-pointer transition-colors ${className}`}
+        className={`${sizeClass} ${widthClass} border border-slate-200 bg-surface hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed rounded-[var(--radius-control)] text-xs font-semibold text-slate-700 inline-flex items-center justify-center gap-1.5 cursor-pointer transition-colors focus-native ${className}`}
       >
         {children}
       </button>
@@ -48,7 +48,7 @@ export function Button({
         type={type}
         onClick={onClick}
         disabled={disabled}
-        className={`${sizeClass} ${widthClass} border border-rose-200 bg-rose-50 hover:bg-rose-100 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg text-xs font-semibold text-rose-700 inline-flex items-center justify-center gap-1.5 cursor-pointer transition-colors ${className}`}
+        className={`${sizeClass} ${widthClass} border border-rose-600 bg-rose-600 hover:bg-rose-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-[var(--radius-control)] text-xs font-semibold text-white inline-flex items-center justify-center gap-1.5 cursor-pointer transition-colors focus-native ${className}`}
       >
         {children}
       </button>

@@ -27,6 +27,10 @@ import { Button } from '../../components/ui/Button';
 import { Tooltip } from '../../components/ui/Tooltip';
 import { Avatar } from '../../components/ui/Avatar';
 import { FormField, inputClass } from '../../components/ui/FormField';
+import { Paginator } from '../../components/ui/Paginator';
+import { usePagination } from '../../hooks/usePagination';
+
+const PAGE_SIZE = 10;
 
 interface FormState {
   fullName: string;
@@ -105,13 +109,15 @@ export function SalesUsersPage() {
   const handleToggle = (id: string) => dispatch(toggleSalesUser(id));
 
   const loading = status === 'loading' && list.length === 0;
+  const pagination = usePagination(PAGE_SIZE, list.length, status);
+  const paged = pagination.slice(list);
 
   return (
     <div className="space-y-6">
       <PageHeader
         title="Sales Users"
         subtitle="Create, edit and assign the sales team to distributors."
-        actions={<Button onClick={openAdd} withPlusIcon tooltip="Add a new sales user">Add Sales User</Button>}
+        actions={<Button onClick={openAdd} withPlusIcon>Add Sales User</Button>}
       />
 
       {error && !dismissedError && (
@@ -135,6 +141,7 @@ export function SalesUsersPage() {
           {list.length === 0 ? (
             <EmptyState title="No sales users yet" hint="Add sales users and assign them to distributors." />
           ) : (
+            <>
             <div className="overflow-x-auto">
               <table className="w-full text-left">
                 <thead>
@@ -147,7 +154,7 @@ export function SalesUsersPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {list.map((u) => (
+                  {paged.map((u) => (
                     <tr key={u.id} className="border-b border-slate-50 hover:bg-slate-50/50">
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2.5">
@@ -159,7 +166,7 @@ export function SalesUsersPage() {
                         <p className="text-xs text-slate-600 flex items-center gap-1.5">
                           <DirectInbox size={12} className="text-slate-400" /> {u.email}
                         </p>
-                        <p className="text-[10px] text-slate-400 flex items-center gap-1.5 mt-0.5">
+                        <p className="text-[10px] text-slate-400 flex items-center gap-1.5 mt-0.5 whitespace-nowrap">
                           <Call size={10} /> {u.phone || '—'}
                         </p>
                       </td>
@@ -203,7 +210,15 @@ export function SalesUsersPage() {
                   ))}
                 </tbody>
               </table>
-            </div>
+              </div>
+              <Paginator
+                page={pagination.page}
+                pageCount={pagination.pageCount}
+                pageSize={PAGE_SIZE}
+                total={pagination.total}
+                onChange={pagination.onPageChange}
+              />
+            </>
           )}
         </div>
       )}

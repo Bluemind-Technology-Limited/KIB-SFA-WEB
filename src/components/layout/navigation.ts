@@ -1,5 +1,5 @@
 import type { Icon } from 'iconsax-reactjs';
-import { Box1, Buildings2, Category, ClipboardText, Profile2User } from 'iconsax-reactjs';
+import { Box1, Buildings2, ClipboardText, Home2, Profile2User } from 'iconsax-reactjs';
 
 export interface NavItem {
   id: string;
@@ -10,7 +10,7 @@ export interface NavItem {
 
 /** Super Admin dashboard navigation. */
 export const navItems: NavItem[] = [
-  { id: 'overview', label: 'Dashboard', path: '/', icon: Category },
+  { id: 'overview', label: 'Dashboard', path: '/', icon: Home2 },
   { id: 'distributors', label: 'Distributors', path: '/distributors', icon: Buildings2 },
   { id: 'sales-users', label: 'Sales Users', path: '/sales-users', icon: Profile2User },
   { id: 'products', label: 'Products', path: '/products', icon: Box1 },

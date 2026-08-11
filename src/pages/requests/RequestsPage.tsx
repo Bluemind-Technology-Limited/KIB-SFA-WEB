@@ -23,7 +23,11 @@ import { StatusBadge } from '../../components/ui/Badge';
 import { Avatar } from '../../components/ui/Avatar';
 import { Modal } from '../../components/ui/Modal';
 import { RequestDetail } from '../../components/requests/RequestDetail';
+import { Paginator } from '../../components/ui/Paginator';
+import { usePagination } from '../../hooks/usePagination';
 import { formatCurrency, timeAgo } from '../../utils/format';
+
+const PAGE_SIZE = 10;
 
 type Filter = 'ALL' | 'PENDING' | 'APPROVED' | 'REJECTED';
 
@@ -67,6 +71,8 @@ export function RequestsPage() {
   };
 
   const filtered = requests.filter((r) => filter === 'ALL' || r.status === filter);
+  const pagination = usePagination(PAGE_SIZE, filtered.length, filter);
+  const paged = pagination.slice(filtered);
   const loading = status === 'loading';
   const showError = status === 'failed' && !dismissedError;
 
@@ -114,6 +120,7 @@ export function RequestsPage() {
           {filtered.length === 0 ? (
             <EmptyState title="No requests found" hint="No requests match the current filter." />
           ) : (
+            <>
             <div className="overflow-x-auto">
               <table className="w-full text-left">
                 <thead>
@@ -128,7 +135,7 @@ export function RequestsPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {filtered.map((req) => (
+                  {paged.map((req) => (
                     <tr
                       key={req.id}
                       className="border-b border-slate-50 hover:bg-slate-50/50 cursor-pointer"
@@ -158,7 +165,15 @@ export function RequestsPage() {
                   ))}
                 </tbody>
               </table>
-            </div>
+              </div>
+              <Paginator
+                page={pagination.page}
+                pageCount={pagination.pageCount}
+                pageSize={PAGE_SIZE}
+                total={pagination.total}
+                onChange={pagination.onPageChange}
+              />
+            </>
           )}
         </div>
       )}

@@ -1,4 +1,8 @@
-/** Global color system — mirrors the KIB-ERP design language. */
+/**
+ * KIB SFA global color system — mirrors the KIB-ERP design language.
+ * Accent = KIB brand red (preserved). Neutrals/status mirror the Tailwind v4
+ * `@theme` tokens in index.css so there is no drift between JS and CSS.
+ */
 export const colors = {
   accent: {
     primary: '#EA4335',
@@ -8,6 +12,9 @@ export const colors = {
     primaryBorder: 'rgba(234, 67, 53, 0.25)',
     gradientStart: '#f05a4f',
     gradientEnd: '#EA4335',
+    tint: '#FDEDEB',
+    hoverTint: '#FDF0EE',
+    focus: 'rgba(234, 67, 53, 0.35)',
   },
   neutral: {
     background: '#FAFAFA',
@@ -25,6 +32,13 @@ export const colors = {
     danger: '#F43F5E',
     info: '#0EA5E9',
   },
+} as const;
+
+/** Platform-feel radii (mirror @theme in index.css). */
+export const radii = {
+  control: 8,
+  card: 12,
+  panel: 16,
 } as const;
 
 /** Status → semantic badge class strings (Tailwind utilities). */
