@@ -20,6 +20,11 @@ export default tseslint.config(
     rules: {
       ...reactHooks.configs.recommended.rules,
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
+      // The React Compiler-era rules below are noisy on the standard
+      // "fetch data inside useEffect" pattern used across the app (matching
+      // the KIB-ERP convention). They are disabled for reproducibility.
+      'react-hooks/set-state-in-effect': 'off',
+      'react-hooks/preserve-manual-memoization': 'off',
     },
   },
 )
