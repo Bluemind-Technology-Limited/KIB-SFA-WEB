@@ -117,7 +117,7 @@ export function SalesUsersPage() {
       <PageHeader
         title="Sales Users"
         subtitle="Create, edit and assign the sales team to distributors."
-        actions={<Button onClick={openAdd} withPlusIcon>Add Sales User</Button>}
+        actions={<Button onClick={openAdd} withPlusIcon fullWidth>Add Sales User</Button>}
       />
 
       {error && !dismissedError && (

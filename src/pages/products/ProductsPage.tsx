@@ -110,7 +110,7 @@ export function ProductsPage() {
       <PageHeader
         title="Products"
         subtitle="Manage the products the sales team can request from distributors."
-        actions={<Button onClick={openAdd} withPlusIcon>Add Product</Button>}
+        actions={<Button onClick={openAdd} withPlusIcon fullWidth>Add Product</Button>}
       />
 
       {error && !dismissedError && (

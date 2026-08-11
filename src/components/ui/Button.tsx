@@ -31,7 +31,7 @@ export function Button({
   className = '',
 }: ButtonProps) {
   const sizeClass = size === 'sm' ? 'h-8 px-3 text-xs' : 'h-9 px-4 text-xs';
-  const widthClass = fullWidth ? 'w-full' : '';
+  const widthClass = fullWidth ? 'w-full sm:w-auto' : '';
 
   const inner =
     variant === 'secondary' ? (

@@ -97,7 +97,7 @@ export function DistributorsPage() {
       <PageHeader
         title="Distributors"
         subtitle="Create and manage the distributors sales users are assigned to."
-        actions={<Button onClick={openAdd} withPlusIcon>Add Distributor</Button>}
+        actions={<Button onClick={openAdd} withPlusIcon fullWidth>Add Distributor</Button>}
       />
 
       {error && !dismissedError && (
