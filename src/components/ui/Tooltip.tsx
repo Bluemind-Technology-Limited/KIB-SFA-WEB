@@ -67,9 +67,13 @@ export function Tooltip({ content, side = 'top', children, className }: TooltipP
     <span
       ref={wrapRef}
       className={`relative inline-block ${className ?? ''}`}
-      onMouseEnter={() => setOpen(true)}
+      onMouseEnter={() => {
+        if (window.matchMedia('(min-width: 768px)').matches) setOpen(true);
+      }}
       onMouseLeave={() => setOpen(false)}
-      onFocus={() => setOpen(true)}
+      onFocus={() => {
+        if (window.matchMedia('(min-width: 768px)').matches) setOpen(true);
+      }}
       onBlur={() => setOpen(false)}
     >
       {children}

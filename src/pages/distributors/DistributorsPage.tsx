@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Buildings2, Call, DirectInbox, Edit, ToggleOn } from 'iconsax-reactjs';
+import { Buildings2, Call, DirectInbox, Edit, ToggleOff, ToggleOn } from 'iconsax-reactjs';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
 import {
   loadDistributors,
@@ -176,7 +176,7 @@ export function DistributorsPage() {
                           </Tooltip>
                           <Tooltip content={d.isActive ? 'Deactivate' : 'Activate'}>
                             <button onClick={() => handleToggle(d.id)} className="text-slate-400 hover:text-[#EA4335] p-1.5 cursor-pointer" aria-label="Toggle active">
-                              <ToggleOn size={14} />
+                              {d.isActive ? <ToggleOn size={14} variant="Bold" className="text-[#EA4335]" /> : <ToggleOff size={14} />}
                             </button>
                           </Tooltip>
                         </div>

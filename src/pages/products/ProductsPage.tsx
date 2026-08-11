@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Box1, Box2, Edit, ToggleOn } from 'iconsax-reactjs';
+import { Box1, Box2, Edit, ToggleOff, ToggleOn } from 'iconsax-reactjs';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
 import {
   loadProducts,
@@ -192,7 +192,7 @@ export function ProductsPage() {
                           </Tooltip>
                           <Tooltip content={p.isActive ? 'Deactivate' : 'Activate'}>
                             <button onClick={() => handleToggle(p.id)} className="text-slate-400 hover:text-[#EA4335] p-1.5 cursor-pointer" aria-label="Toggle active">
-                              <ToggleOn size={14} />
+                              {p.isActive ? <ToggleOn size={14} variant="Bold" className="text-[#EA4335]" /> : <ToggleOff size={14} />}
                             </button>
                           </Tooltip>
                         </div>
