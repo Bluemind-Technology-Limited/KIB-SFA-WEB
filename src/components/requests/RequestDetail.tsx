@@ -21,14 +21,16 @@ interface RequestDetailProps {
   reviewing: boolean;
   onReview: (status: 'APPROVED' | 'REJECTED', notes?: string) => void;
   showReview?: boolean;
+  /** Show the responsible distributor line (hidden in the distributor's own view). */
+  showDistributor?: boolean;
 }
 
 /**
- * Full breakdown of a product request for the Super Admin: submitter,
- * responsible distributor, items, quantities, amounts and optional review
- * controls (admin can also approve/reject on the distributor's behalf).
+ * Full breakdown of a single product request: submitter, items, quantities,
+ * amounts and the approve / reject controls. The Super Admin sees the
+ * responsible distributor as well.
  */
-export function RequestDetail({ request, reviewing, onReview, showReview = true }: RequestDetailProps) {
+export function RequestDetail({ request, reviewing, onReview, showReview = true, showDistributor = true }: RequestDetailProps) {
   const [rejectionNote, setRejectionNote] = useState('');
   const [showRejectForm, setShowRejectForm] = useState(false);
 
@@ -54,11 +56,15 @@ export function RequestDetail({ request, reviewing, onReview, showReview = true 
           <DocumentText size={14} />
           <span className="font-mono font-semibold text-slate-700">{request.id.toUpperCase()}</span>
         </span>
-        <span className="hidden sm:inline text-slate-300">·</span>
-        <span className="flex items-center gap-1.5">
-          <Buildings2 size={14} />
-          <span>{request.distributorName}</span>
-        </span>
+        {showDistributor && request.distributorName && (
+          <>
+            <span className="hidden sm:inline text-slate-300">·</span>
+            <span className="flex items-center gap-1.5">
+              <Buildings2 size={14} />
+              <span>{request.distributorName}</span>
+            </span>
+          </>
+        )}
       </div>
 
       <div className="border border-[#E9E9E9] rounded-lg overflow-hidden">

@@ -1,11 +1,12 @@
 import type { Distributor, Product, ProductRequest, User } from '../types/domain';
 
 /**
- * Simulated in-memory database for the Super Admin dashboard.
+ * Simulated in-memory database for the merged KIB SFA app.
  *
- * The backend is not available yet, so the admin frontend runs against this
- * local dataset covering distributors, sales users, products and requests.
- * When the real API lands this module is replaced by HTTP clients.
+ * The backend is not available yet, so both the Super Admin and Distributor
+ * dashboards run against this local dataset covering distributors, sales
+ * users, products and requests. When the real API lands this module is
+ * replaced by HTTP clients without touching the UI.
  */
 
 const counter: Record<string, number> = {};
@@ -34,6 +35,17 @@ export const users: User[] = [
     distributorId: null,
     isActive: true,
     createdAt: daysAgo(150),
+  },
+  {
+    id: 'dist_1_logon',
+    role: 'DISTRIBUTOR',
+    fullName: 'Japheth Jerry',
+    email: 'distributor@kibgroup.app',
+    password: 'password',
+    distributorId: 'dist_1',
+    isActive: true,
+    phone: '+234 801 234 5678',
+    createdAt: daysAgo(120),
   },
   {
     id: 'sales_1',
@@ -138,7 +150,7 @@ export const requests: ProductRequest[] = [
     status: 'REJECTED',
     items: [{ productId: 'prod_5', productName: 'Desperados', unit: 'Crate', price: 10800, quantity: 8 }],
     totalAmount: 86400,
-    notes: 'Out of stock at the moment.',
+    notes: 'Out of stock at the moment. Please try again next week.',
     createdAt: daysAgo(4),
     reviewedAt: daysAgo(3),
   },

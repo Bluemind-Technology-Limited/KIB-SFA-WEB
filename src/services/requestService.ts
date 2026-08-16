@@ -7,11 +7,18 @@ export interface ReviewDecision {
   notes?: string;
 }
 
-/** Simulated request API — the Super Admin sees requests across all distributors. */
+/**
+ * Simulated request API. Without a distributorId the Super Admin sees every
+ * request across all distributors; with one, only that distributor's requests
+ * are returned. Mirrors future `GET /requests`, `PATCH /requests/:id`.
+ */
 export const requestService = {
-  async list(): Promise<ProductRequest[]> {
+  async list(distributorId?: string): Promise<ProductRequest[]> {
     await delay();
-    return clone([...requests].sort((a, b) => b.createdAt.localeCompare(a.createdAt)));
+    const scoped = distributorId
+      ? requests.filter((r) => r.distributorId === distributorId)
+      : [...requests];
+    return clone(scoped.sort((a, b) => b.createdAt.localeCompare(a.createdAt)));
   },
 
   async getById(id: string): Promise<ProductRequest | undefined> {

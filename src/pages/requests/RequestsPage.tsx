@@ -15,6 +15,7 @@ import {
   selectReviewingId,
   selectRequestError,
 } from '../../store/slices/requestSlice';
+import { selectUser } from '../../store/slices/authSlice';
 import { PageHeader } from '../../components/ui/PageHeader';
 import { TableSkeleton } from '../../components/ui/Skeleton';
 import { EmptyState } from '../../components/ui/EmptyState';
@@ -32,14 +33,21 @@ const PAGE_SIZE = 10;
 
 type Filter = 'ALL' | 'PENDING' | 'APPROVED' | 'REJECTED';
 
-/** Request board — the Super Admin sees every request across all distributors. */
+/**
+ * Request board shared by both roles. The Super Admin sees every request
+ * across all distributors (with a distributor column); a distributor sees
+ * only their own channel's requests.
+ */
 export function RequestsPage() {
   const dispatch = useAppDispatch();
+  const user = useAppSelector(selectUser);
   const requests = useAppSelector(selectRequests);
   const status = useAppSelector(selectRequestsStatus);
   const selected = useAppSelector(selectSelectedRequest);
   const reviewingId = useAppSelector(selectReviewingId);
   const error = useAppSelector(selectRequestError);
+
+  const isAdmin = user?.role === 'SUPER_ADMIN';
 
   const [searchParams, setSearchParams] = useSearchParams();
   const filterParam = (searchParams.get('filter') ?? 'ALL') as Filter;
@@ -56,8 +64,12 @@ export function RequestsPage() {
   };
 
   const load = useCallback(() => {
-    dispatch(loadRequests());
-  }, [dispatch]);
+    if (isAdmin) {
+      dispatch(loadRequests());
+    } else if (user?.distributorId) {
+      dispatch(loadRequests(user.distributorId));
+    }
+  }, [dispatch, isAdmin, user?.distributorId]);
 
   useEffect(() => {
     load();
@@ -80,8 +92,12 @@ export function RequestsPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="All Requests"
-        subtitle="View and manage product requests across all distributors and sales users."
+        title={isAdmin ? 'All Requests' : 'Product Requests'}
+        subtitle={
+          isAdmin
+            ? 'View and manage product requests across all distributors and sales users.'
+            : 'Approve or reject requests submitted by your assigned sales team.'
+        }
       />
 
       {showError && (
@@ -119,7 +135,10 @@ export function RequestsPage() {
       ) : (
         <div className="bg-white border border-[#E9E9E9] rounded-xl overflow-hidden">
           {filtered.length === 0 ? (
-            <EmptyState title="No requests found" hint="No requests match the current filter." />
+            <EmptyState
+              title="No requests found"
+              hint={isAdmin ? 'No requests match the current filter.' : 'Requests from your sales team will appear here.'}
+            />
           ) : (
             <>
             <div className="overflow-x-auto">
@@ -127,7 +146,7 @@ export function RequestsPage() {
                 <thead>
                   <tr className="border-b border-slate-100 text-[10px] uppercase tracking-wider text-slate-400">
                     <th className="px-4 py-3 font-semibold">Sales User</th>
-                    <th className="px-4 py-3 font-semibold">Distributor</th>
+                    {isAdmin && <th className="px-4 py-3 font-semibold">Distributor</th>}
                     <th className="px-4 py-3 font-semibold">Items</th>
                     <th className="px-4 py-3 font-semibold">Total</th>
                     <th className="px-4 py-3 font-semibold">Submitted</th>
@@ -148,10 +167,14 @@ export function RequestsPage() {
                           <p className="text-xs font-bold text-[#171717] leading-none">{req.salesUserName}</p>
                         </div>
                       </td>
-                      <td className="px-4 py-3">
-                        <span className="text-xs text-slate-600 max-w-[160px] truncate block">{req.distributorName}</span>
+                      {isAdmin && (
+                        <td className="px-4 py-3">
+                          <span className="text-xs text-slate-600 max-w-[160px] truncate block">{req.distributorName}</span>
+                        </td>
+                      )}
+                      <td className="px-4 py-3 text-xs text-slate-600">
+                        {req.items.length} {isAdmin ? 'item' : 'product'}{req.items.length === 1 ? '' : 's'}
                       </td>
-                      <td className="px-4 py-3 text-xs text-slate-600">{req.items.length} item{req.items.length === 1 ? '' : 's'}</td>
                       <td className="px-4 py-3 text-xs font-semibold text-[#171717]">{formatCurrency(req.totalAmount)}</td>
                       <td className="px-4 py-3 text-xs text-slate-500">{timeAgo(req.createdAt)}</td>
                       <td className="px-4 py-3">
@@ -187,6 +210,7 @@ export function RequestsPage() {
               request={selected}
               reviewing={reviewingId === selected.id}
               onReview={(decisionStatus, notes) => handleReview(selected.id, decisionStatus, notes)}
+              showDistributor={isAdmin}
             />
             <div className="flex justify-end mt-5">
               <button

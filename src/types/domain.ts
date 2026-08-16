@@ -1,7 +1,7 @@
 /**
- * Core Sales Force Automation domain types for the Super Admin dashboard.
- * These cover the full management surface: distributors, sales users,
- * products and cross-platform requests.
+ * Core Sales Force Automation domain types for the merged KIB SFA app.
+ * One source of truth for both the Super Admin and Distributor dashboards,
+ * mirroring the intended backend models (camelCase).
  */
 
 export type UserRole = 'SALES' | 'DISTRIBUTOR' | 'SUPER_ADMIN';
@@ -65,6 +65,7 @@ export interface ProductRequest {
   reviewedAt?: string;
 }
 
+/** Super Admin platform-wide metrics. */
 export interface AdminMetrics {
   totalDistributors: number;
   totalSales: number;
@@ -72,4 +73,13 @@ export interface AdminMetrics {
   pendingRequests: number;
   approvedRequests: number;
   rejectedRequests: number;
+}
+
+/** Metrics scoped to a signed-in distributor. */
+export interface DashboardMetrics {
+  totalSales: number;
+  pendingRequests: number;
+  approvedRequests: number;
+  rejectedRequests: number;
+  totalRequests: number;
 }

@@ -20,7 +20,14 @@ const initialState: RequestState = {
   error: null,
 };
 
-export const loadRequests = createAsyncThunk('requests/load', () => requestService.list());
+/**
+ * Load requests. The Super Admin loads everything; a distributor passes their
+ * distributorId so only their own requests are returned.
+ */
+export const loadRequests = createAsyncThunk(
+  'requests/load',
+  (distributorId?: string) => requestService.list(distributorId)
+);
 
 export const openRequest = createAsyncThunk('requests/open', (id: string) => requestService.getById(id));
 
@@ -53,6 +60,9 @@ const requestSlice = createSlice({
       .addCase(loadRequests.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.error.message || 'Failed to load requests.';
+      })
+      .addCase(openRequest.pending, (state) => {
+        state.error = null;
       })
       .addCase(openRequest.fulfilled, (state, action: PayloadAction<ProductRequest | undefined>) => {
         state.selected = action.payload ?? null;

@@ -3,11 +3,15 @@ import { useEffect, useState } from 'react';
 import { ArrowLeft2, ArrowRight2, Logout } from 'iconsax-reactjs';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
 import { logout, selectUser } from '../../store/slices/authSlice';
-import { navItems, findNavItem } from './navigation';
+import { navItemsForRole, findNavItem } from './navigation';
 import { Avatar } from '../ui/Avatar';
 import { Tooltip } from '../ui/Tooltip';
 
-/** Super Admin dashboard shell: collapsible sidebar + sticky topbar + routed content. */
+/**
+ * Shared dashboard shell for both roles: collapsible sidebar + sticky topbar
+ * + routed content. Branding and navigation are derived from the signed-in
+ * role (Super Admin vs Distributor).
+ */
 export function AppShell() {
   const user = useAppSelector(selectUser);
   const dispatch = useAppDispatch();
@@ -18,7 +22,11 @@ export function AppShell() {
     () => localStorage.getItem('kib-sfa-sb-collapsed') === '1'
   );
 
-  const active = findNavItem(location.pathname);
+  const isDistributor = user?.role === 'DISTRIBUTOR';
+  const brandTitle = isDistributor ? 'KIB Sales' : 'KIB Admin';
+  const brandSub = isDistributor ? 'Distributor' : 'Super Admin';
+  const navItems = navItemsForRole(user?.role);
+  const active = findNavItem(location.pathname, navItems);
 
   useEffect(() => {
     setAccountOpen(false);
@@ -56,8 +64,8 @@ export function AppShell() {
             />
             {!collapsed && (
               <div className="min-w-0">
-                <p className="text-[13px] font-bold text-text leading-tight truncate">KIB Admin</p>
-                <p className="text-[10px] font-semibold text-text-muted uppercase tracking-wider">Super Admin</p>
+                <p className="text-[13px] font-bold text-text leading-tight truncate">{brandTitle}</p>
+                <p className="text-[10px] font-semibold text-text-muted uppercase tracking-wider">{brandSub}</p>
               </div>
             )}
           </div>
@@ -80,7 +88,7 @@ export function AppShell() {
               <NavLink
                 key={item.id}
                 to={item.path}
-                end={item.path === '/'}
+                end={item.exact === true}
                 className={({ isActive }) =>
                   `w-full group flex items-center justify-center py-2 rounded-[var(--radius-control)] transition-colors cursor-pointer ${
                     isActive
@@ -148,8 +156,8 @@ export function AppShell() {
               <div className="flex items-center gap-2 md:hidden">
                 <img src="/kib-group.png" alt="KIB Group" className="h-10 w-auto object-contain shrink-0 self-center mt-1" />
                 <div className="min-w-0 leading-tight self-center">
-                  <p className="text-[13px] font-bold text-text truncate">KIB Admin</p>
-                  <p className="text-[10px] font-semibold text-text-muted uppercase tracking-wider">Super Admin</p>
+                  <p className="text-[13px] font-bold text-text truncate">{brandTitle}</p>
+                  <p className="text-[10px] font-semibold text-text-muted uppercase tracking-wider">{brandSub}</p>
                 </div>
               </div>
               <span className="hidden md:inline text-text-muted tracking-tight">Sales Force Automation</span>
@@ -185,7 +193,7 @@ export function AppShell() {
               <NavLink
                 key={item.id}
                 to={item.path}
-                end={item.path === '/'}
+                end={item.exact === true}
                 className={({ isActive }) =>
                   `group flex-1 flex flex-col items-center justify-center gap-1 py-1.5 transition-colors ${
                     isActive ? 'text-accent' : 'text-text-muted active:text-accent'

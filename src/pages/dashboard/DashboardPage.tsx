@@ -4,8 +4,8 @@ import { Link } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
 import { selectUser } from '../../store/slices/authSlice';
 import { loadRequests, selectRequests, selectRequestsStatus } from '../../store/slices/requestSlice';
-import { fetchAdminMetrics } from '../../services/dashboardService';
-import type { AdminMetrics } from '../../types/domain';
+import { fetchAdminMetrics, fetchDistributorMetrics } from '../../services/dashboardService';
+import type { AdminMetrics, DashboardMetrics } from '../../types/domain';
 import { PageHeader } from '../../components/ui/PageHeader';
 import { MetricCard } from '../../components/ui/MetricCard';
 import { MetricSkeleton, Skeleton } from '../../components/ui/Skeleton';
@@ -14,20 +14,25 @@ import { StatusBadge } from '../../components/ui/Badge';
 import { Avatar } from '../../components/ui/Avatar';
 import { formatCurrency, timeAgo } from '../../utils/format';
 
-/** Super Admin overview: platform-wide metrics + recent requests. */
+/** Role-aware overview: platform metrics (admin) or channel metrics (distributor). */
 export function DashboardPage() {
   const dispatch = useAppDispatch();
   const user = useAppSelector(selectUser);
   const requests = useAppSelector(selectRequests);
   const requestStatus = useAppSelector(selectRequestsStatus);
 
-  const [metrics, setMetrics] = useState<AdminMetrics | null>(null);
+  const isAdmin = user?.role === 'SUPER_ADMIN';
+  const [metrics, setMetrics] = useState<AdminMetrics | DashboardMetrics | null>(null);
   const [metricsError, setMetricsError] = useState(false);
   const [metricsKey, setMetricsKey] = useState(0);
 
   const load = useCallback(() => {
-    dispatch(loadRequests());
-  }, [dispatch]);
+    if (isAdmin) {
+      dispatch(loadRequests());
+    } else if (user?.distributorId) {
+      dispatch(loadRequests(user.distributorId));
+    }
+  }, [dispatch, isAdmin, user?.distributorId]);
 
   useEffect(() => {
     load();
@@ -35,9 +40,13 @@ export function DashboardPage() {
 
   useEffect(() => {
     let active = true;
+    if (!isAdmin && !user?.distributorId) return;
     setMetrics(null);
     setMetricsError(false);
-    fetchAdminMetrics()
+    const promise = isAdmin
+      ? fetchAdminMetrics()
+      : fetchDistributorMetrics(user.distributorId!);
+    promise
       .then((m) => {
         if (active) setMetrics(m);
       })
@@ -47,15 +56,20 @@ export function DashboardPage() {
     return () => {
       active = false;
     };
-  }, [metricsKey]);
+  }, [isAdmin, user?.distributorId, metricsKey]);
 
   const recent = [...requests].sort((a, b) => b.createdAt.localeCompare(a.createdAt)).slice(0, 5);
+  const requestsHref = isAdmin ? '/admin/requests' : '/distributor/requests';
 
   return (
     <div className="space-y-8">
       <PageHeader
-        title={`Welcome back, ${user?.fullName?.split(' ')[0] || 'Admin'}`}
-        subtitle="Complete visibility and control over the sales force automation platform."
+        title={`Welcome back, ${user?.fullName?.split(' ')[0] || (isAdmin ? 'Admin' : 'Distributor')}`}
+        subtitle={
+          isAdmin
+            ? 'Complete visibility and control over the sales force automation platform.'
+            : 'Review product requests from your assigned sales team.'
+        }
       />
 
       {metricsError && !metrics && (
@@ -65,17 +79,26 @@ export function DashboardPage() {
       )}
 
       {!metrics && !metricsError ? (
-        <MetricSkeleton count={6} />
+        <MetricSkeleton count={isAdmin ? 6 : 4} />
       ) : (
         metrics && (
-          <div className="grid grid-cols-2 md:grid-cols-2 xl:grid-cols-3 gap-2.5 md:gap-4">
-            <MetricCard label="Distributors" icon={<Buildings2 size={16} className="text-[#EA4335]" />} value={metrics.totalDistributors} sub="on platform" />
-            <MetricCard label="Sales Users" icon={<Profile2User size={16} className="text-sky-600" />} value={metrics.totalSales} sub="active reps" />
-            <MetricCard label="Products" icon={<Box1 size={16} className="text-violet-600" />} value={metrics.totalProducts} sub="catalogue" />
-            <MetricCard label="Pending Requests" icon={<DirectboxReceive size={16} className="text-amber-600" />} value={metrics.pendingRequests} sub="awaiting review" />
-            <MetricCard label="Approved" icon={<TickCircle size={16} className="text-emerald-600" />} value={metrics.approvedRequests} sub="fulfilled" />
-            <MetricCard label="Rejected" icon={<CloseCircle size={16} className="text-rose-600" />} value={metrics.rejectedRequests} sub="declined" />
-          </div>
+          isAdmin ? (
+            <div className="grid grid-cols-2 md:grid-cols-2 xl:grid-cols-3 gap-2.5 md:gap-4">
+              <MetricCard label="Distributors" icon={<Buildings2 size={16} className="text-[#EA4335]" />} value={(metrics as AdminMetrics).totalDistributors} sub="on platform" />
+              <MetricCard label="Sales Users" icon={<Profile2User size={16} className="text-sky-600" />} value={metrics.totalSales} sub="active reps" />
+              <MetricCard label="Products" icon={<Box1 size={16} className="text-violet-600" />} value={(metrics as AdminMetrics).totalProducts} sub="catalogue" />
+              <MetricCard label="Pending Requests" icon={<DirectboxReceive size={16} className="text-amber-600" />} value={metrics.pendingRequests} sub="awaiting review" />
+              <MetricCard label="Approved" icon={<TickCircle size={16} className="text-emerald-600" />} value={metrics.approvedRequests} sub="fulfilled" />
+              <MetricCard label="Rejected" icon={<CloseCircle size={16} className="text-rose-600" />} value={metrics.rejectedRequests} sub="declined" />
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 md:grid-cols-2 xl:grid-cols-4 gap-2.5 md:gap-4">
+              <MetricCard label="Sales Team" icon={<Profile2User size={16} className="text-[#EA4335]" />} value={metrics.totalSales} sub="assigned" />
+              <MetricCard label="Pending Requests" icon={<DirectboxReceive size={16} className="text-amber-600" />} value={metrics.pendingRequests} sub="awaiting review" />
+              <MetricCard label="Approved" icon={<TickCircle size={16} className="text-emerald-600" />} value={metrics.approvedRequests} sub="fulfilled" />
+              <MetricCard label="Rejected" icon={<CloseCircle size={16} className="text-rose-600" />} value={metrics.rejectedRequests} sub="declined" />
+            </div>
+          )
         )
       )}
 
@@ -86,7 +109,7 @@ export function DashboardPage() {
             <ClipboardText size={16} className="text-[#EA4335]" />
             <span className="text-xs font-semibold text-[#737373]">Recent Requests</span>
           </div>
-          <Link to="/requests" className="text-xs font-semibold text-[#EA4335] flex items-center gap-1 hover:underline">
+          <Link to={requestsHref} className="text-xs font-semibold text-[#EA4335] flex items-center gap-1 hover:underline">
             View all <ArrowRight2 size={12} />
           </Link>
         </div>
@@ -98,17 +121,21 @@ export function DashboardPage() {
             ))}
           </div>
         ) : recent.length === 0 ? (
-          <div className="p-6 text-center text-xs text-slate-400">No requests yet.</div>
+          <div className="p-6 text-center text-xs text-slate-400">
+            {isAdmin ? 'No requests yet.' : 'No requests yet. Your sales team has not submitted any requests.'}
+          </div>
         ) : (
           <div className="divide-y divide-slate-50">
             {recent.map((req) => (
-              <Link key={req.id} to="/requests" className="flex items-center justify-between px-4 py-3 hover:bg-slate-50/60 transition-colors">
+              <Link key={req.id} to={requestsHref} className="flex items-center justify-between px-4 py-3 hover:bg-slate-50/60 transition-colors">
                 <div className="flex items-center gap-3 min-w-0">
                   <Avatar name={req.salesUserName} size="sm" />
                   <div className="min-w-0">
                     <p className="text-xs font-bold text-[#171717] leading-tight truncate">{req.salesUserName}</p>
                     <p className="text-[11px] text-slate-400 mt-0.5 truncate">
-                      {req.distributorName} · {req.items.length} item{req.items.length === 1 ? '' : 's'} · {formatCurrency(req.totalAmount)}
+                      {isAdmin
+                        ? `${req.distributorName} · ${req.items.length} item${req.items.length === 1 ? '' : 's'} · ${formatCurrency(req.totalAmount)}`
+                        : `${req.items.length} product${req.items.length === 1 ? '' : 's'} · ${formatCurrency(req.totalAmount)}`}
                     </p>
                   </div>
                 </div>

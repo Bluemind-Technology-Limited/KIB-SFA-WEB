@@ -10,7 +10,7 @@ interface AuthState {
   error: string | null;
 }
 
-const STORAGE_KEY = 'kib_sfa_admin_session';
+const STORAGE_KEY = 'kib_sfa_session';
 
 function loadSession(): { user: User | null; token: string | null } {
   try {
@@ -67,7 +67,9 @@ const authSlice = createSlice({
       })
       .addCase(login.rejected, (state, action) => {
         state.status = 'failed';
-        state.error = action.error.message || 'Sign in failed.';
+        state.error =
+          (action.error.message?.includes('Invalid') ? action.error.message : 'Sign in failed. Please try again.') ||
+          'Sign in failed.';
       });
   },
 });

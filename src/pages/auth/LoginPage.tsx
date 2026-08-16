@@ -3,8 +3,14 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { CloseCircle, Eye, EyeSlash, InfoCircle } from 'iconsax-reactjs';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
 import { login, selectAuthError, selectAuthStatus } from '../../store/slices/authSlice';
+import { roleHome } from '../../routes/roles';
 
-/** Super Admin sign-in screen, styled after the KIB-ERP login gate. */
+const DEMO_ACCOUNTS: { label: string; email: string }[] = [
+  { label: 'Admin', email: 'admin@kibgroup.app' },
+  { label: 'Distributor', email: 'distributor@kibgroup.app' },
+];
+
+/** Shared sign-in gate for both roles, styled after the KIB-ERP login screen. */
 export function LoginPage() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -18,7 +24,6 @@ export function LoginPage() {
   const [error, setError] = useState('');
 
   const isSubmitting = status === 'loading';
-  const from = (location.state as { from?: string } | null)?.from ?? '/';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,7 +34,10 @@ export function LoginPage() {
     setError('');
     const result = await dispatch(login({ email, password }));
     if (login.fulfilled.match(result)) {
-      navigate(from, { replace: true });
+      const from = (location.state as { from?: string } | null)?.from;
+      // Land on the intended route when it belongs to this role, otherwise the role home.
+      const target = from && !from.startsWith('/login') ? from : roleHome(result.payload.user.role);
+      navigate(target, { replace: true });
     }
   };
 
@@ -62,10 +70,10 @@ export function LoginPage() {
 
         <div className="w-[448px] max-w-full bg-surface rounded-2xl p-5 border border-slate-200 flex flex-col gap-3">
           <h2 className="text-[23px] font-semibold text-text tracking-tight leading-8">
-            Sign in to the admin portal
+            Sign in to KIB SFA
           </h2>
           <p className="text-xs text-slate-500">
-            Manage distributors, sales users, products and requests across the platform.
+            Super admins manage the platform; distributors review their sales team&apos;s requests.
           </p>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-3">
@@ -112,9 +120,28 @@ export function LoginPage() {
             </button>
           </form>
 
-          <p className="text-center text-xs text-slate-500 pt-1">
-            Demo credentials are pre-filled — just press <span className="font-semibold text-slate-600">Sign in</span>.
-          </p>
+          <div className="flex items-center gap-2 pt-1">
+            <span className="text-[11px] text-slate-400">Demo:</span>
+            {DEMO_ACCOUNTS.map((account) => (
+              <button
+                key={account.email}
+                type="button"
+                onClick={() => {
+                  setEmail(account.email);
+                  setPassword('password');
+                  setError('');
+                }}
+                className={`text-[11px] font-semibold rounded-lg border px-2.5 py-1 transition-colors cursor-pointer ${
+                  email === account.email
+                    ? 'bg-accent-tint border-accent/40 text-accent'
+                    : 'border-[#E9E9E9] text-slate-500 hover:border-accent/50 hover:text-accent'
+                }`}
+              >
+                {account.label}
+              </button>
+            ))}
+            <span className="text-[11px] text-slate-400">(password: password)</span>
+          </div>
         </div>
       </main>
     </div>
