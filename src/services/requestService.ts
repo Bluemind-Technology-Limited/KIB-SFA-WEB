@@ -1,38 +1,35 @@
 import type { ProductRequest, RequestStatus } from '../types/domain';
-import { requests } from './mockDb';
-import { delay, clone } from './mockHelpers';
+import { apiFetch } from './api';
+import { asArray, mapRequest } from './mappers';
 
 export interface ReviewDecision {
   status: Exclude<RequestStatus, 'PENDING'>;
-  notes?: string;
+  reviewNote?: string;
 }
 
 /**
- * Simulated request API. Without a distributorId the Super Admin sees every
- * request across all distributors; with one, only that distributor's requests
- * are returned. Mirrors future `GET /requests`, `PATCH /requests/:id`.
+ * Requests via the Express API. GET /api/requests is role-filtered
+ * server-side, so a distributor only ever receives their own channel's
+ * requests; the optional id is accepted for signature parity with the store.
  */
 export const requestService = {
-  async list(distributorId?: string): Promise<ProductRequest[]> {
-    await delay();
-    const scoped = distributorId
-      ? requests.filter((r) => r.distributorId === distributorId)
-      : [...requests];
-    return clone(scoped.sort((a, b) => b.createdAt.localeCompare(a.createdAt)));
+  async list(_distributorId?: string): Promise<ProductRequest[]> {
+    void _distributorId; // GET /api/requests is role-filtered server-side
+    const data = await apiFetch<unknown>('/api/requests');
+    return asArray(data).map(mapRequest);
   },
 
   async getById(id: string): Promise<ProductRequest | undefined> {
-    await delay();
-    return clone(requests.find((r) => r.id === id));
+    const data = await apiFetch<Record<string, unknown>>(`/api/requests/${id}`);
+    return data ? mapRequest(data) : undefined;
   },
 
+  /** Approve or reject a request (PATCH /api/requests/:id/review). */
   async review(id: string, decision: ReviewDecision): Promise<ProductRequest> {
-    await delay(500);
-    const request = requests.find((r) => r.id === id);
-    if (!request) throw new Error('Request not found.');
-    request.status = decision.status;
-    request.reviewedAt = new Date().toISOString();
-    request.notes = decision.notes || request.notes;
-    return clone(request);
+    const data = await apiFetch<Record<string, unknown>>(`/api/requests/${id}/review`, {
+      method: 'PATCH',
+      body: JSON.stringify({ status: decision.status, reviewNote: decision.reviewNote }),
+    });
+    return mapRequest(data ?? {});
   },
 };

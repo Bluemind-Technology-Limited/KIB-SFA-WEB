@@ -1,22 +1,20 @@
-import type { User } from '../types/domain';
-import * as db from './mockDb';
-import { delay, clone } from './mockHelpers';
+import type { Product, User } from '../types/domain';
+import { apiFetch } from './api';
+import { asArray, mapProduct, mapUser } from './mappers';
 
 export type SalesMember = User;
 
-/**
- * Simulated sales-team API scoped to a distributor.
- * Mirrors future `GET /distributors/:id/sales-users`.
- */
+/** Distributor-scoped views via the Express API. */
 export const salesTeamService = {
+  /** Sales users assigned to a distributor (GET /api/distributors/:id/sales-users). */
   async list(distributorId: string): Promise<SalesMember[]> {
-    await delay();
-    return clone(db.users.filter((u) => u.role === 'SALES' && u.distributorId === distributorId));
+    const data = await apiFetch<unknown>(`/api/distributors/${distributorId}/sales-users`);
+    return asArray(data).map(mapUser);
   },
 
-  /** Active product catalogue the sales team can request from. */
-  async products(): Promise<typeof db.products> {
-    await delay();
-    return clone(db.products.filter((p) => p.isActive));
+  /** Active product catalogue (GET /api/products). */
+  async products(): Promise<Product[]> {
+    const data = await apiFetch<unknown>('/api/products');
+    return asArray(data).map(mapProduct);
   },
 };

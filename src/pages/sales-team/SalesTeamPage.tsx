@@ -18,15 +18,16 @@ export function SalesTeamPage() {
   const [key, setKey] = useState(0);
 
   const load = useCallback(() => {
-    if (!user?.distributorId) return;
+    if (!user) return;
     setLoading(true);
     setError(false);
+    // The distributor's own user id IS the distributor id the backend keys on.
     salesTeamService
-      .list(user.distributorId)
+      .list(user.id)
       .then(setMembers)
       .catch(() => setError(true))
       .finally(() => setLoading(false));
-  }, [user?.distributorId]);
+  }, [user]);
 
   useEffect(() => {
     load();

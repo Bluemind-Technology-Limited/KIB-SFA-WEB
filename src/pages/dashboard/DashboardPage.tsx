@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
 import { selectUser } from '../../store/slices/authSlice';
 import { loadRequests, selectRequests, selectRequestsStatus } from '../../store/slices/requestSlice';
+import { useRequestRealtime } from '../../hooks/useRequestRealtime';
 import { fetchAdminMetrics, fetchDistributorMetrics } from '../../services/dashboardService';
 import type { AdminMetrics, DashboardMetrics } from '../../types/domain';
 import { PageHeader } from '../../components/ui/PageHeader';
@@ -26,13 +27,12 @@ export function DashboardPage() {
   const [metricsError, setMetricsError] = useState(false);
   const [metricsKey, setMetricsKey] = useState(0);
 
+  useRequestRealtime();
+
   const load = useCallback(() => {
-    if (isAdmin) {
-      dispatch(loadRequests());
-    } else if (user?.distributorId) {
-      dispatch(loadRequests(user.distributorId));
-    }
-  }, [dispatch, isAdmin, user?.distributorId]);
+    // GET /api/requests is role-filtered server-side — no id needed.
+    dispatch(loadRequests());
+  }, [dispatch]);
 
   useEffect(() => {
     load();
@@ -40,12 +40,12 @@ export function DashboardPage() {
 
   useEffect(() => {
     let active = true;
-    if (!isAdmin && !user?.distributorId) return;
+    if (!user?.id) return;
     setMetrics(null);
     setMetricsError(false);
     const promise = isAdmin
       ? fetchAdminMetrics()
-      : fetchDistributorMetrics(user.distributorId!);
+      : fetchDistributorMetrics(user.id);
     promise
       .then((m) => {
         if (active) setMetrics(m);
@@ -56,7 +56,7 @@ export function DashboardPage() {
     return () => {
       active = false;
     };
-  }, [isAdmin, user?.distributorId, metricsKey]);
+  }, [isAdmin, user?.id, metricsKey]);
 
   const recent = [...requests].sort((a, b) => b.createdAt.localeCompare(a.createdAt)).slice(0, 5);
   const requestsHref = isAdmin ? '/admin/requests' : '/distributor/requests';

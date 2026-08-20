@@ -1,6 +1,6 @@
 import type { Product } from '../types/domain';
-import * as db from './mockDb';
-import { delay, clone, mockError } from './mockHelpers';
+import { apiFetch } from './api';
+import { asArray, mapProduct } from './mappers';
 
 export interface ProductInput {
   name: string;
@@ -11,44 +11,49 @@ export interface ProductInput {
   stock: number;
 }
 
-/** Simulated CRUD for products (Super Admin). */
+/**
+ * Product catalogue via the Express API. The backend model only stores
+ * name/sku/description/unit/isActive — `price` and `stock` are frontend-only
+ * until the backend adds them, so they are not sent in create/update payloads.
+ */
 export const productService = {
+  /** Admin list — includes inactive products via ?includeInactive=true. */
   async list(): Promise<Product[]> {
-    await delay();
-    return clone(db.products);
+    const data = await apiFetch<unknown>('/api/products?includeInactive=true');
+    return asArray(data).map(mapProduct);
   },
 
   async create(input: ProductInput): Promise<Product> {
-    await delay(500);
-    if (!input.name.trim() || !input.sku.trim()) {
-      mockError('Product name and SKU are required.');
-    }
-    const product: Product = {
-      id: db.mockId('prod'),
-      ...clone(input),
-      description: input.description.trim(),
-      price: Number(input.price) || 0,
-      stock: Number(input.stock) || 0,
-      isActive: true,
-      createdAt: new Date().toISOString(),
-    };
-    db.products.unshift(product);
-    return clone(product);
+    const data = await apiFetch<Record<string, unknown>>('/api/products', {
+      method: 'POST',
+      body: JSON.stringify({
+        name: input.name,
+        sku: input.sku,
+        description: input.description,
+        unit: input.unit,
+      }),
+    });
+    return mapProduct(data ?? {});
   },
 
   async update(id: string, input: Partial<ProductInput>): Promise<Product> {
-    await delay(500);
-    const product = db.products.find((p) => p.id === id);
-    if (!product) mockError('Product not found.');
-    Object.assign(product, input);
-    return clone(db.products.find((p) => p.id === id)!);
+    const data = await apiFetch<Record<string, unknown>>(`/api/products/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify({
+        name: input.name,
+        sku: input.sku,
+        description: input.description,
+        unit: input.unit,
+      }),
+    });
+    return mapProduct(data ?? {});
   },
 
+  /** Deactivate a product (DELETE is the documented deactivation verb). */
   async toggleActive(id: string): Promise<Product> {
-    await delay(400);
-    const product = db.products.find((p) => p.id === id);
-    if (!product) mockError('Product not found.');
-    product.isActive = !product.isActive;
-    return clone(product);
+    const data = await apiFetch<Record<string, unknown>>(`/api/products/${id}`, {
+      method: 'DELETE',
+    });
+    return mapProduct(data ?? {});
   },
 };

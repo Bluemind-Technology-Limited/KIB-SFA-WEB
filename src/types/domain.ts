@@ -1,7 +1,10 @@
 /**
- * Core Sales Force Automation domain types for the merged KIB SFA app.
- * One source of truth for both the Super Admin and Distributor dashboards,
- * mirroring the intended backend models (camelCase).
+ * Core Sales Force Automation domain types for the merged KIB SFA web app.
+ * One source of truth for both the Super Admin and Distributor dashboards.
+ *
+ * Backend naming is reconciled here: the API returns `name` for people, which
+ * maps to `fullName` (see services/mappers.ts). `password` no longer lives on
+ * the User type — Supabase handles authentication.
  */
 
 export type UserRole = 'SALES' | 'DISTRIBUTOR' | 'SUPER_ADMIN';
@@ -13,11 +16,10 @@ export interface User {
   role: UserRole;
   fullName: string;
   email: string;
-  password: string;
   distributorId: string | null;
   isActive: boolean;
   phone?: string;
-  createdAt: string;
+  createdAt?: string;
 }
 
 export interface Distributor {
@@ -28,7 +30,7 @@ export interface Distributor {
   location: string;
   address: string;
   isActive: boolean;
-  createdAt: string;
+  createdAt?: string;
 }
 
 export interface Product {
@@ -40,7 +42,7 @@ export interface Product {
   price: number;
   stock: number;
   isActive: boolean;
-  createdAt: string;
+  createdAt?: string;
 }
 
 export interface RequestItem {

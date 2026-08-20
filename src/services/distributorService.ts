@@ -1,6 +1,6 @@
 import type { Distributor } from '../types/domain';
-import * as db from './mockDb';
-import { delay, clone, mockError } from './mockHelpers';
+import { apiFetch } from './api';
+import { asArray, mapDistributor } from './mappers';
 
 export interface DistributorInput {
   name: string;
@@ -10,44 +10,39 @@ export interface DistributorInput {
   address: string;
 }
 
-/** Simulated CRUD for distributors (Super Admin). */
+/** CRUD for distributors via the Express API (Super Admin). */
 export const distributorService = {
   async list(): Promise<Distributor[]> {
-    await delay();
-    return clone(db.distributors);
+    const data = await apiFetch<unknown>('/api/distributors');
+    return asArray(data).map(mapDistributor);
   },
 
   async create(input: DistributorInput): Promise<Distributor> {
-    await delay(500);
-    if (!input.name.trim()) mockError('Distributor name is required.');
-    const distributor: Distributor = {
-      id: db.mockId('dist'),
-      ...clone(input),
-      isActive: true,
-      createdAt: new Date().toISOString(),
-    };
-    db.distributors.unshift(distributor);
-    return clone(distributor);
+    const data = await apiFetch<Record<string, unknown>>('/api/distributors', {
+      method: 'POST',
+      body: JSON.stringify(input),
+    });
+    return mapDistributor(data ?? {});
   },
 
   async update(id: string, input: Partial<DistributorInput>): Promise<Distributor> {
-    await delay(500);
-    const distributor = db.distributors.find((d) => d.id === id);
-    if (!distributor) mockError('Distributor not found.');
-    Object.assign(distributor, input);
-    return clone(db.distributors.find((d) => d.id === id)!);
+    const data = await apiFetch<Record<string, unknown>>(`/api/distributors/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(input),
+    });
+    return mapDistributor(data ?? {});
   },
 
+  /** Deactivate a distributor (DELETE is the documented deactivation verb). */
   async toggleActive(id: string): Promise<Distributor> {
-    await delay(400);
-    const distributor = db.distributors.find((d) => d.id === id);
-    if (!distributor) mockError('Distributor not found.');
-    distributor.isActive = !distributor.isActive;
-    return clone(distributor);
+    const data = await apiFetch<Record<string, unknown>>(`/api/distributors/${id}`, {
+      method: 'DELETE',
+    });
+    return mapDistributor(data ?? {});
   },
 
   async salesCount(id: string): Promise<number> {
-    await delay(120);
-    return db.users.filter((u) => u.role === 'SALES' && u.distributorId === id).length;
+    const data = await apiFetch<unknown>(`/api/distributors/${id}/sales-users`);
+    return asArray(data).length;
   },
 };

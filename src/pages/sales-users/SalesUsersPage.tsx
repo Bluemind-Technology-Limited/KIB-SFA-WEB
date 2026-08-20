@@ -37,11 +37,11 @@ interface FormState {
   fullName: string;
   email: string;
   phone: string;
-  password: string;
+  authId: string;
   distributorId: string;
 }
 
-const emptyForm: FormState = { fullName: '', email: '', phone: '', password: 'password', distributorId: '' };
+const emptyForm: FormState = { fullName: '', email: '', phone: '', authId: '', distributorId: '' };
 
 /** Manage sales users: create, edit, assign to a distributor, toggle active. */
 export function SalesUsersPage() {
@@ -85,7 +85,7 @@ export function SalesUsersPage() {
       fullName: u.fullName,
       email: u.email,
       phone: u.phone ?? '',
-      password: u.password,
+      authId: '', // only needed when creating — the backend never returns it on the wire
       distributorId: u.distributorId ?? '',
     });
     setShowModal(true);
@@ -95,11 +95,12 @@ export function SalesUsersPage() {
     e.preventDefault();
     if (!form.fullName.trim() || !form.email.trim()) return;
     const payload = {
-      fullName: form.fullName,
+      name: form.fullName,
       email: form.email,
       phone: form.phone,
-      password: form.password,
       distributorId: form.distributorId || null,
+      // The backend links users to an existing Supabase auth account via authId.
+      ...(!editing ? { authId: form.authId } : {}),
     };
     const result = dispatch(saveSalesUser({ id: editing?.id, input: payload }));
     result.then((action) => {
@@ -247,8 +248,13 @@ export function SalesUsersPage() {
               <FormField label="Phone">
                 <input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} className={inputClass} />
               </FormField>
-              <FormField label="Password">
-                <input value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} className={inputClass} />
+              <FormField label="Supabase Auth ID" required={!editing} span>
+                <input
+                  value={form.authId}
+                  onChange={(e) => setForm({ ...form, authId: e.target.value })}
+                  placeholder={editing ? 'Only used when creating' : "e.g. the user's Supabase UID"}
+                  className={inputClass}
+                />
               </FormField>
               <FormField label="Assigned Distributor" span>
                 <select

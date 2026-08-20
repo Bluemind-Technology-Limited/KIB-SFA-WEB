@@ -16,6 +16,7 @@ import {
   selectRequestError,
 } from '../../store/slices/requestSlice';
 import { selectUser } from '../../store/slices/authSlice';
+import { useRequestRealtime } from '../../hooks/useRequestRealtime';
 import { PageHeader } from '../../components/ui/PageHeader';
 import { TableSkeleton } from '../../components/ui/Skeleton';
 import { EmptyState } from '../../components/ui/EmptyState';
@@ -49,6 +50,8 @@ export function RequestsPage() {
 
   const isAdmin = user?.role === 'SUPER_ADMIN';
 
+  useRequestRealtime();
+
   const [searchParams, setSearchParams] = useSearchParams();
   const filterParam = (searchParams.get('filter') ?? 'ALL') as Filter;
   const filter: Filter = ['ALL', 'PENDING', 'APPROVED', 'REJECTED'].includes(filterParam)
@@ -64,12 +67,9 @@ export function RequestsPage() {
   };
 
   const load = useCallback(() => {
-    if (isAdmin) {
-      dispatch(loadRequests());
-    } else if (user?.distributorId) {
-      dispatch(loadRequests(user.distributorId));
-    }
-  }, [dispatch, isAdmin, user?.distributorId]);
+    // GET /api/requests is role-filtered server-side — no id needed.
+    dispatch(loadRequests());
+  }, [dispatch]);
 
   useEffect(() => {
     load();
@@ -80,7 +80,7 @@ export function RequestsPage() {
   }, [status]);
 
   const handleReview = (id: string, decisionStatus: 'APPROVED' | 'REJECTED', notes?: string) => {
-    dispatch(reviewRequest({ id, decision: { status: decisionStatus, notes } }));
+    dispatch(reviewRequest({ id, decision: { status: decisionStatus, reviewNote: notes } }));
   };
 
   const filtered = requests.filter((r) => filter === 'ALL' || r.status === filter);

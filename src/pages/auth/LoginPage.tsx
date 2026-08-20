@@ -1,13 +1,13 @@
 import { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Navigate } from 'react-router-dom';
 import { CloseCircle, Eye, EyeSlash, InfoCircle } from 'iconsax-reactjs';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
-import { login, selectAuthError, selectAuthStatus } from '../../store/slices/authSlice';
+import { login, selectAuthError, selectAuthStatus, selectUser } from '../../store/slices/authSlice';
 import { roleHome } from '../../routes/roles';
 
 const DEMO_ACCOUNTS: { label: string; email: string }[] = [
-  { label: 'Admin', email: 'admin@kibgroup.app' },
-  { label: 'Distributor', email: 'distributor@kibgroup.app' },
+  { label: 'Admin', email: 'admin@kibsfa.com' },
+  { label: 'Distributor', email: 'distributor@sfa.com' },
 ];
 
 /** Shared sign-in gate for both roles, styled after the KIB-ERP login screen. */
@@ -17,11 +17,17 @@ export function LoginPage() {
   const location = useLocation();
   const status = useAppSelector(selectAuthStatus);
   const serverError = useAppSelector(selectAuthError);
+  const user = useAppSelector(selectUser);
 
-  const [email, setEmail] = useState('admin@kibgroup.app');
-  const [password, setPassword] = useState('password');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+
+  // Already signed in (e.g. session restored on boot) — skip the login form.
+  if (user) {
+    return <Navigate to={roleHome(user.role)} replace />;
+  }
 
   const isSubmitting = status === 'loading';
 
@@ -131,11 +137,10 @@ export function LoginPage() {
                   setPassword('password');
                   setError('');
                 }}
-                className={`text-[11px] font-semibold rounded-lg border px-2.5 py-1 transition-colors cursor-pointer ${
-                  email === account.email
+                className={`text-[11px] font-semibold rounded-lg border px-2.5 py-1 transition-colors cursor-pointer ${email === account.email
                     ? 'bg-accent-tint border-accent/40 text-accent'
                     : 'border-[#E9E9E9] text-slate-500 hover:border-accent/50 hover:text-accent'
-                }`}
+                  }`}
               >
                 {account.label}
               </button>
